@@ -8,15 +8,49 @@ import { CreditCardIcon, FlameIcon } from "lucide-react";
 import { useAuth, UserButton } from "@clerk/nextjs";
 
 import { useCreditBalance } from "@/hooks/use-credit-balance";
+import { useTeams } from "@/hooks/team/use-teams";
+import { useTeam } from "@/hooks/team/use-team";
+import { useUpdateTeam } from "@/hooks/team/use-update-team";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "./ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const navLinks = [
   { label: "Discover", href: "/discover" },
   { label: "Generations", href: "/generations" },
   { label: "Billing", href: "/billing" },
 ];
+
+function TeamSelect() {
+  const { data: teams, isLoading } = useTeams();
+  const { teamId } = useTeam();
+  const { mutate: updateTeam } = useUpdateTeam();
+
+  if (isLoading) return <Skeleton className="h-8 w-32" />;
+  if (!teams?.length) return null;
+
+  return (
+    <Select value={teamId ?? undefined} onValueChange={(id) => updateTeam(id)}>
+      <SelectTrigger size="sm" className="max-w-fit bg-transparent">
+        <SelectValue placeholder="Select team" />
+      </SelectTrigger>
+      <SelectContent>
+        {teams.map((team) => (
+          <SelectItem key={team.id} value={team.id!}>
+            {team.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
 
 export function AppNav() {
   const pathname = usePathname();
@@ -56,6 +90,7 @@ export function AppNav() {
         <div className="flex items-center gap-3">
           {isLoaded && isSignedIn ? (
             <>
+              {/* <TeamSelect /> */}
               <div className="flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 px-3 py-1">
                 <CreditCardIcon className="size-3 text-muted-foreground" />
                 {isLoading ? (
