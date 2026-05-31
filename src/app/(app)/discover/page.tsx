@@ -47,10 +47,8 @@ export default function DiscoverPage() {
   const groups = groupByCategory(rest);
   const categories = Object.keys(groups);
 
-  // Stable context so contextSafe works for button spring handlers
   const { contextSafe } = useGSAP({ scope: heroRef });
 
-  // Hero entrance stagger — fires once when featured data arrives
   useGSAP(
     () => {
       if (!featured) return;
@@ -66,7 +64,6 @@ export default function DiscoverPage() {
     { scope: heroRef, dependencies: [!!featured], revertOnUpdate: true },
   );
 
-  // Hero CTA button spring handlers
   const onBtnEnter = contextSafe((e: React.MouseEvent<HTMLButtonElement>) => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     gsap.to(e.currentTarget, {
@@ -77,6 +74,7 @@ export default function DiscoverPage() {
       overwrite: "auto",
     });
   });
+
   const onBtnLeave = contextSafe((e: React.MouseEvent<HTMLButtonElement>) => {
     gsap.to(e.currentTarget, {
       y: 0,
@@ -86,6 +84,7 @@ export default function DiscoverPage() {
       overwrite: "auto",
     });
   });
+
   const onBtnDown = contextSafe((e: React.MouseEvent<HTMLButtonElement>) => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     gsap.to(e.currentTarget, {
@@ -95,6 +94,7 @@ export default function DiscoverPage() {
       overwrite: "auto",
     });
   });
+
   const onBtnUp = contextSafe((e: React.MouseEvent<HTMLButtonElement>) => {
     gsap.to(e.currentTarget, {
       scale: 1,
