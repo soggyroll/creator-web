@@ -14,11 +14,12 @@ import {
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
-import { useWorkflows, type Workflow } from "@/hooks/use-workflows";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
+import { useWorkflows } from "@/hooks/use-workflows";
+import { Workflow } from "@/types/entities";
 
 gsap.registerPlugin(useGSAP);
 

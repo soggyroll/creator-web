@@ -1,20 +1,22 @@
 /** @format */
 
+import { CreditBalanceResponse, LedgerEntry } from "@/types/api/credits";
 import { WorkflowResponse } from "@/types/api/workflows";
-
 import { GenerationResult } from "@/types/api/generations";
 import { Team, TeamWithMembership, TeamMember } from "@/types/api/teams";
 import { apiClient } from "../api-client";
 import { Workflow } from "@/types/entities";
 
 export const api = {
-  workflows: {
-    get: async (): Promise<Workflow[]> => {
-      const { data } = await apiClient.get("/workflows");
+  credits: {
+    get: async (): Promise<CreditBalanceResponse> => {
+      const { data } = await apiClient.get("/credits");
       return data;
     },
-    getById: async (id: string): Promise<WorkflowResponse> => {
-      const { data } = await apiClient.get(`/workflows/${id}`);
+    getLedger: async (limit?: number): Promise<LedgerEntry[]> => {
+      const { data } = await apiClient.get("/credits/ledger", {
+        params: { limit },
+      });
       return data;
     },
   },
@@ -43,6 +45,17 @@ export const api = {
     },
     getMembers: async (id: string): Promise<TeamMember[]> => {
       const { data } = await apiClient.get(`/teams/${id}/members`);
+      return data;
+    },
+  },
+
+  workflows: {
+    get: async (): Promise<Workflow[]> => {
+      const { data } = await apiClient.get("/workflows");
+      return data;
+    },
+    getById: async (id: string): Promise<WorkflowResponse> => {
+      const { data } = await apiClient.get(`/workflows/${id}`);
       return data;
     },
   },
