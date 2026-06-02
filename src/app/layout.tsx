@@ -3,6 +3,7 @@ import { Figtree, Inter } from "next/font/google";
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { shadcn } from "@clerk/ui/themes";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
@@ -40,6 +41,7 @@ export default function RootLayout({
             <Toaster />
             {children}
           </Providers>
+          <SpeedInsights />
         </body>
       </html>
     </ClerkProvider>
