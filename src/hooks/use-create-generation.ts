@@ -5,7 +5,7 @@ import type { GithubComComfyCreatorsCreatorBackendInternalServiceGenerationGener
 import { useGenerationsSimulator } from "@/contexts/generations-simulator";
 
 export function useCreateGeneration() {
-  const { createGeneration } = useGenerationsSimulator();
+  const { createGeneration, createGenerationBatch } = useGenerationsSimulator();
   const [isPending, setIsPending] = useState(false);
 
   const mutate = useCallback(
@@ -29,5 +29,26 @@ export function useCreateGeneration() {
     [createGeneration],
   );
 
-  return { mutate, isPending, error: null };
+  const mutateBatch = useCallback(
+    (
+      inputs: GenInput[],
+      options?: {
+        onSuccess?: (ids: string[]) => void;
+        onError?: (err: Error) => void;
+      },
+    ) => {
+      setIsPending(true);
+      try {
+        const ids = createGenerationBatch(inputs);
+        options?.onSuccess?.(ids);
+      } catch (err) {
+        options?.onError?.(err as Error);
+      } finally {
+        setIsPending(false);
+      }
+    },
+    [createGenerationBatch],
+  );
+
+  return { mutate, mutateBatch, isPending, error: null };
 }
