@@ -5,21 +5,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
-import {
-  ChevronDownIcon,
-  RefreshCwIcon,
-} from "lucide-react";
+import { ChevronDownIcon, RefreshCwIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { useWorkflows } from "@/hooks/use-workflows";
 import { useCreateGeneration } from "@/hooks/use-create-generation";
 
 import { Button } from "@/components/ui/button";
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -64,16 +57,17 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
   const [showAdditional, setShowAdditional] = useState(false);
   const [priority, setPriority] = useState<BatchPriority>("standard");
   const nextDraftNumber = useRef(2);
-  const [drafts, setDrafts] = useState<BatchDraft[]>([
-    createDraft("draft-1"),
-  ]);
+  const [drafts, setDrafts] = useState<BatchDraft[]>([createDraft("draft-1")]);
   const [activeDraftId, setActiveDraftId] = useState("draft-1");
 
   const { data: workflows } = useWorkflows();
   const workflow = workflows?.find((w) => w.id === workflowId);
 
-  const { mutateBatch: createGenerationBatch, isPending, error } =
-    useCreateGeneration();
+  const {
+    mutateBatch: createGenerationBatch,
+    isPending,
+    error,
+  } = useCreateGeneration();
 
   const activeDraft = useMemo(
     () => drafts.find((draft) => draft.id === activeDraftId) ?? drafts[0],
@@ -200,10 +194,10 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
   const sampleImages = workflow?.sampleOutputs ?? [];
   const values = activeDraft.values;
   const selectedPreset =
-    IMAGE_SIZE_PRESETS.find((preset) => preset.value === values.imageSizePreset) ??
-    IMAGE_SIZE_PRESETS[1];
-  const canSubmit =
-    !isSignedIn || (!isPending && isBatchReady);
+    IMAGE_SIZE_PRESETS.find(
+      (preset) => preset.value === values.imageSizePreset,
+    ) ?? IMAGE_SIZE_PRESETS[1];
+  const canSubmit = !isSignedIn || (!isPending && isBatchReady);
   const runLabel = !isSignedIn
     ? "Sign in to run"
     : isPending
@@ -222,23 +216,18 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
         <div className="flex w-[45%] shrink-0 flex-col overflow-y-auto border-r border-border pt-5 scrollbar-hide">
           <div className="px-6 pb-4">
             <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Generation #{activeIndex + 1}
-                </p>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="xs"
-                  onClick={resetActiveDraft}
-                  className="text-muted-foreground"
-                >
-                  Reset
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {readyDrafts.length}/{drafts.length} ready
+              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                Generation #{activeIndex + 1}
               </p>
+              <Button
+                type="button"
+                variant="ghost"
+                size="xs"
+                onClick={resetActiveDraft}
+                className="text-muted-foreground"
+              >
+                Reset
+              </Button>
             </div>
 
             <FieldGroup className="mb-5">
@@ -250,7 +239,9 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
                   placeholder="A serene mountain landscape at sunset with golden light"
                   rows={5}
                   value={values.prompt}
-                  onChange={(e) => updateActiveValues({ prompt: e.target.value })}
+                  onChange={(e) =>
+                    updateActiveValues({ prompt: e.target.value })
+                  }
                   autoFocus
                 />
               </Field>
@@ -372,7 +363,9 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
                       type="number"
                       placeholder="random"
                       value={values.seed}
-                      onChange={(e) => updateActiveValues({ seed: e.target.value })}
+                      onChange={(e) =>
+                        updateActiveValues({ seed: e.target.value })
+                      }
                     />
                     <Button
                       type="button"
@@ -411,7 +404,6 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
               </FieldGroup>
             )}
           </div>
-
         </div>
 
         <PreviewPanel
