@@ -90,6 +90,8 @@ interface SimulatorContextValue {
   generations: GenResult[];
   /** Adds a generation and drives it through queued → running → completed/failed. Returns the new generation id. */
   createGeneration: (input: GenInput) => string;
+  /** Adds multiple generations as one local batch. Returns the new generation ids. */
+  createGenerationBatch: (inputs: GenInput[]) => string[];
 }
 
 const SimulatorContext = createContext<SimulatorContextValue | null>(null);
@@ -188,8 +190,16 @@ export function GenerationsSimulatorProvider({
     [update],
   );
 
+  const createGenerationBatch = useCallback(
+    (inputs: GenInput[]): string[] =>
+      inputs.map((input) => createGeneration(input)),
+    [createGeneration],
+  );
+
   return (
-    <SimulatorContext.Provider value={{ generations, createGeneration }}>
+    <SimulatorContext.Provider
+      value={{ generations, createGeneration, createGenerationBatch }}
+    >
       {children}
     </SimulatorContext.Provider>
   );

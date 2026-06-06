@@ -7,6 +7,8 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
 import Providers from "@/components/providers";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 const interHeading = Inter({ subsets: ["latin"], variable: "--font-heading" });
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
@@ -39,6 +41,8 @@ export default function RootLayout({
           <Providers>
             <Toaster />
             {children}
+            <Analytics />
+            <SpeedInsights />
           </Providers>
         </body>
       </html>
