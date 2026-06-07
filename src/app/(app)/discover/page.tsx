@@ -4,13 +4,7 @@
 
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
-import {
-  ArrowRightIcon,
-  BookmarkIcon,
-  HeartIcon,
-  MessageCircleIcon,
-  ZapIcon,
-} from "lucide-react";
+import { ArrowRightIcon, BookmarkIcon, HeartIcon, ZapIcon } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
@@ -23,7 +17,7 @@ import { Workflow } from "@/types/entities";
 
 gsap.registerPlugin(useGSAP);
 
-function fmtCount(n: number): string {
+function fmtCount(n = 0): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1000) return `${(n / 1000).toFixed(n >= 10_000 ? 0 : 1)}k`;
   return String(n);
@@ -32,8 +26,9 @@ function fmtCount(n: number): string {
 function groupByCategory(workflows: Workflow[]) {
   const groups: Record<string, Workflow[]> = {};
   for (const w of workflows) {
-    if (!groups[w.category]) groups[w.category] = [];
-    groups[w.category].push(w);
+    const category = w.team?.name ?? "Workflows";
+    if (!groups[category]) groups[category] = [];
+    groups[category].push(w);
   }
   return groups;
 }
@@ -114,7 +109,7 @@ export default function DiscoverPage() {
         ) : (
           <>
             <Image
-              src={featured.thumbnailUrl}
+              src={featured.cover_url ?? ""}
               alt=""
               aria-hidden
               className="absolute inset-0 h-full w-full object-cover"
@@ -129,9 +124,11 @@ export default function DiscoverPage() {
               ref={heroRef}
               className="absolute inset-x-0 bottom-0 px-8 pb-12 md:px-14 md:pb-16"
             >
-              <Badge variant="secondary" className="hero-item mb-3 text-xs">
-                {featured.category}
-              </Badge>
+              {featured.team?.name ? (
+                <Badge variant="secondary" className="hero-item mb-3 text-xs">
+                  {featured.team.name}
+                </Badge>
+              ) : null}
               <h1 className="hero-item max-w-lg text-balance text-3xl font-semibold leading-tight tracking-tight md:text-4xl">
                 {featured.name}
               </h1>
@@ -142,19 +139,15 @@ export default function DiscoverPage() {
               <div className="hero-item mt-3 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <ZapIcon className="size-3" />
-                  {fmtCount(featured.stats.generations)} runs
+                  {fmtCount(featured.stats?.runs)} runs
                 </span>
                 <span className="flex items-center gap-1">
                   <HeartIcon className="size-3" />
-                  {fmtCount(featured.stats.likes)}
-                </span>
-                <span className="flex items-center gap-1">
-                  <MessageCircleIcon className="size-3" />
-                  {fmtCount(featured.stats.comments)}
+                  {fmtCount(featured.stats?.likes)}
                 </span>
                 <span className="flex items-center gap-1">
                   <BookmarkIcon className="size-3" />
-                  {fmtCount(featured.stats.bookmarks)}
+                  {fmtCount(featured.stats?.saves)}
                 </span>
               </div>
               <div className="hero-item mt-6 flex flex-wrap gap-3">
@@ -296,7 +289,7 @@ function WorkflowCard({ workflow }: { workflow: Workflow }) {
     >
       {/* Poster image */}
       <Image
-        src={workflow.thumbnailUrl}
+        src={workflow.cover_url ?? ""}
         alt=""
         aria-hidden
         className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
@@ -314,7 +307,7 @@ function WorkflowCard({ workflow }: { workflow: Workflow }) {
       <div className="absolute right-2.5 top-2.5">
         <span className="flex items-center gap-1 rounded-full border border-white/15 bg-black/60 px-2 py-0.5 text-xs font-semibold text-white/80 backdrop-blur-sm">
           <ZapIcon className="size-3" />
-          {fmtCount(workflow.stats.generations)}
+          {fmtCount(workflow.stats?.runs)}
         </span>
       </div>
 
@@ -337,15 +330,11 @@ function WorkflowCard({ workflow }: { workflow: Workflow }) {
         <div className="mt-2 flex items-center gap-3 text-sm text-white/55">
           <span className="flex items-center gap-1">
             <HeartIcon className="size-3" />
-            {fmtCount(workflow.stats.likes)}
-          </span>
-          <span className="flex items-center gap-1">
-            <MessageCircleIcon className="size-3" />
-            {fmtCount(workflow.stats.comments)}
+            {fmtCount(workflow.stats?.likes)}
           </span>
           <span className="flex items-center gap-1">
             <BookmarkIcon className="size-3" />
-            {fmtCount(workflow.stats.bookmarks)}
+            {fmtCount(workflow.stats?.saves)}
           </span>
         </div>
       </div>

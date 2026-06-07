@@ -1,7 +1,7 @@
 /** @format */
 
 import { CreditBalanceResponse, LedgerEntry } from "@/types/api/credits";
-import { WorkflowResponse } from "@/types/api/workflows";
+import { WorkflowPage, WorkflowResponse } from "@/types/api/workflows";
 import { GenerationResult } from "@/types/api/generations";
 import { Team, TeamWithMembership, TeamMember } from "@/types/api/teams";
 import { apiClient } from "../api-client";
@@ -51,11 +51,13 @@ export const api = {
 
   workflows: {
     get: async (): Promise<Workflow[]> => {
-      const { data } = await apiClient.get("/workflows");
-      return data;
+      const { data } = await apiClient.get<WorkflowPage>("/workflows");
+      return data.data;
     },
     getById: async (id: string): Promise<WorkflowResponse> => {
-      const { data } = await apiClient.get(`/workflows/${id}`);
+      const { data } = await apiClient.get<WorkflowResponse>(
+        `/workflows/${id}`,
+      );
       return data;
     },
   },

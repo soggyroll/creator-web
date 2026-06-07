@@ -191,7 +191,7 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
     });
   }
 
-  const sampleImages = workflow?.sampleOutputs ?? [];
+  const sampleImages = workflow?.cover_url ? [workflow.cover_url] : [];
   const values = activeDraft.values;
   const selectedPreset =
     IMAGE_SIZE_PRESETS.find(
