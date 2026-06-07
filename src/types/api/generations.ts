@@ -36,9 +36,27 @@ export interface Attachment {
 }
 
 export type FaultSource = string;
-export type BatchPriority = string;
+export type BatchPriority = "urgent" | "standard" | "patient";
 export type GenerationStatus = string;
 export interface WorkflowInputs {
   image_urls?: Record<string, string>;
   primitive_inputs?: Record<string, unknown>;
+}
+
+export interface GenerationInput {
+  attachments?: Attachment[];
+  inputs?: WorkflowInputs;
+  prompt?: string;
+  workflow_id: string;
+}
+
+export interface GenerateRequest {
+  generations: GenerationInput[];
+  priority: BatchPriority;
+}
+
+export interface GenerateResponse {
+  batch_id?: string;
+  generation_ids?: string[];
+  status?: string;
 }

@@ -1,12 +1,13 @@
 /** @format */
 
-import type { GetApiV1GenerationsParams } from "@/api/models";
-import { useGenerationsSimulator } from "@/contexts/generations-simulator";
+import { api } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
 
 export const GENERATIONS_QUERY_KEY = ["generations"] as const;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function useGenerations(_params?: GetApiV1GenerationsParams) {
-  const { generations } = useGenerationsSimulator();
-  return { data: generations, isLoading: false };
+export function useGenerations(options?: { limit?: number }) {
+  return useQuery({
+    queryKey: [...GENERATIONS_QUERY_KEY, options?.limit],
+    queryFn: () => api.generations.get(options?.limit),
+  });
 }

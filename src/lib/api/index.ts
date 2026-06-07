@@ -2,7 +2,11 @@
 
 import { CreditBalanceResponse, LedgerEntry } from "@/types/api/credits";
 import { WorkflowPage, WorkflowResponse } from "@/types/api/workflows";
-import { GenerationResult } from "@/types/api/generations";
+import {
+  GenerateRequest,
+  GenerateResponse,
+  GenerationResult,
+} from "@/types/api/generations";
 import { Team, TeamWithMembership, TeamMember } from "@/types/api/teams";
 import { apiClient } from "../api-client";
 import { Workflow } from "@/types/entities";
@@ -22,6 +26,10 @@ export const api = {
   },
 
   generations: {
+    create: async (request: GenerateRequest): Promise<GenerateResponse> => {
+      const { data } = await apiClient.post("/generate", request);
+      return data;
+    },
     get: async (limit?: number): Promise<GenerationResult[]> => {
       const { data } = await apiClient.get("/generations", {
         params: { limit },

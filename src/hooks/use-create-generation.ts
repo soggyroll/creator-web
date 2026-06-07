@@ -1,54 +1,15 @@
 /** @format */
 
-import { useCallback, useState } from "react";
-import type { GithubComComfyCreatorsCreatorBackendInternalServiceGenerationGenerationInput as GenInput } from "@/api/models";
-import { useGenerationsSimulator } from "@/contexts/generations-simulator";
+import { api } from "@/lib/api";
+import { GenerateRequest } from "@/types/api/generations";
+import { useMutation } from "@tanstack/react-query";
 
 export function useCreateGeneration() {
-  const { createGeneration, createGenerationBatch } = useGenerationsSimulator();
-  const [isPending, setIsPending] = useState(false);
-
-  const mutate = useCallback(
-    (
-      input: GenInput,
-      options?: {
-        onSuccess?: (id: string) => void;
-        onError?: (err: Error) => void;
-      },
-    ) => {
-      setIsPending(true);
-      try {
-        const id = createGeneration(input);
-        options?.onSuccess?.(id);
-      } catch (err) {
-        options?.onError?.(err as Error);
-      } finally {
-        setIsPending(false);
-      }
+  return useMutation({
+    mutationKey: ["create-generation"],
+    mutationFn: async (request: GenerateRequest) => {
+      const response = await api.generations.create(request);
+      return response;
     },
-    [createGeneration],
-  );
-
-  const mutateBatch = useCallback(
-    (
-      inputs: GenInput[],
-      options?: {
-        onSuccess?: (ids: string[]) => void;
-        onError?: (err: Error) => void;
-      },
-    ) => {
-      setIsPending(true);
-      try {
-        const ids = createGenerationBatch(inputs);
-        options?.onSuccess?.(ids);
-      } catch (err) {
-        options?.onError?.(err as Error);
-      } finally {
-        setIsPending(false);
-      }
-    },
-    [createGenerationBatch],
-  );
-
-  return { mutate, mutateBatch, isPending, error: null };
+  });
 }

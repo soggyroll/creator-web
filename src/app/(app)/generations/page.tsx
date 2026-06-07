@@ -98,11 +98,11 @@ export default function GenerationsPage() {
                 </div>
 
                 {/* Credits */}
-                {gen?.credit_cost != null && (
+                {
                   <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
-                    {gen.credit_cost} cr
+                    {"0"} cr
                   </span>
-                )}
+                }
 
                 {/* Status */}
                 <Badge
