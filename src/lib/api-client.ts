@@ -2,17 +2,19 @@
 
 import Axios, { AxiosRequestConfig, AxiosError } from "axios";
 
-export const AXIOS_INSTANCE = Axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+const VERSION_PREFIX = "/api/v1";
+
+export const apiClient = Axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL + VERSION_PREFIX,
   withCredentials: true,
 });
 
 // Add a second `options` argument to pass extra options to each query
-export const api = <T>(
+export const client = <T>(
   config: AxiosRequestConfig,
   options?: AxiosRequestConfig,
 ): Promise<T> => {
-  const promise = AXIOS_INSTANCE({
+  const promise = apiClient({
     ...config,
     ...options,
   }).then(({ data }) => data);

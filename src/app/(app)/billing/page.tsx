@@ -46,7 +46,7 @@ export default function BillingPage() {
             </p>
           )}
         </div>
-        <Button onClick={handleBuyCredits} className="gap-2">
+        <Button onClick={handleBuyCredits}>
           <PlusIcon className="size-4" />
           Buy Credits
         </Button>

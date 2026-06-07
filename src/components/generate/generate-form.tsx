@@ -32,7 +32,7 @@ import {
 } from "./types";
 
 interface GenerateFormProps {
-  workflowId: string | null;
+  workflowId: string;
 }
 
 type BatchPriority = "urgent" | "standard" | "patient";
@@ -64,7 +64,7 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
   const workflow = workflows?.find((w) => w.id === workflowId);
 
   const {
-    mutateBatch: createGenerationBatch,
+    mutate: createGenerationBatch,
     isPending,
     error,
   } = useCreateGeneration();
@@ -179,19 +179,35 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
       prompt: draft.values.prompt.trim(),
     }));
 
-    createGenerationBatch(generations, {
-      onSuccess: () => {
-        toast.success(
-          generations.length === 1
-            ? "Batch queued."
-            : `${generations.length} generations queued as a ${priority} batch.`,
-        );
-        router.push("/generations");
+    createGenerationBatch(
+      // TODO: map to real request body when API is ready
+      {
+        generations: [
+          {
+            prompt: generations[0].prompt,
+            workflow_id: workflowId,
+            attachments: [
+              { type: "image", url: "https://placekitten.com/400/400" },
+            ],
+            inputs: {},
+          },
+        ],
+        priority: "urgent",
       },
-    });
+      {
+        onSuccess: () => {
+          toast.success(
+            generations.length === 1
+              ? "Batch queued."
+              : `${generations.length} generations queued as a ${priority} batch.`,
+          );
+          router.push("/generations");
+        },
+      },
+    );
   }
 
-  const sampleImages = workflow?.sampleOutputs ?? [];
+  const sampleImages = workflow?.cover_url ? [workflow.cover_url] : [];
   const values = activeDraft.values;
   const selectedPreset =
     IMAGE_SIZE_PRESETS.find(

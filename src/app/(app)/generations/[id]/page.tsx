@@ -180,12 +180,7 @@ export default function GenerationDetailPage({
                     : "—"
                 }
               />
-              <DetailRow
-                label="Credit cost"
-                value={
-                  gen?.credit_cost != null ? `${gen.credit_cost} credits` : "—"
-                }
-              />
+              <DetailRow label="Credit cost" value={"0"} />
               {gen?.prompt && (
                 <div className="py-3">
                   <dt className="mb-1 text-xs text-muted-foreground">Prompt</dt>

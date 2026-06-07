@@ -48,7 +48,6 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
     "husky": "^9.1.7",
-    "orval": "^8.6.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   },

@@ -11,7 +11,6 @@ import {
   BookmarkIcon,
   Heart,
   HeartIcon,
-  MessageCircleIcon,
   Share2,
   ZapIcon,
 } from "lucide-react";
@@ -26,7 +25,7 @@ import Image from "next/image";
 
 gsap.registerPlugin(useGSAP);
 
-function fmtCount(n: number): string {
+function fmtCount(n = 0): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1000) return `${(n / 1000).toFixed(n >= 10_000 ? 0 : 1)}k`;
   return String(n);
@@ -100,7 +99,7 @@ export default function WorkflowPage({
         ) : (
           <>
             <Image
-              src={workflow.thumbnailUrl}
+              src={workflow.cover_url ?? ""}
               alt=""
               width={720}
               height={405}
@@ -128,11 +127,11 @@ export default function WorkflowPage({
                 {/* Left: meta */}
                 <div>
                   <div className="mb-3 flex flex-wrap gap-2">
-                    {workflow.tags.map((tag) => (
-                      <Badge key={tag} variant="secondary" className="text-xs">
-                        {tag}
+                    {workflow.team?.name ? (
+                      <Badge variant="secondary" className="text-xs">
+                        {workflow.team.name}
                       </Badge>
-                    ))}
+                    ) : null}
                   </div>
                   <h1 className="max-w-xl text-balance text-3xl font-semibold tracking-tight md:text-4xl">
                     {workflow.name}
@@ -144,22 +143,17 @@ export default function WorkflowPage({
                   <div className="mt-4 flex flex-wrap items-center gap-5 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1.5">
                       <ZapIcon className="size-3.5" />
-                      {fmtCount(workflow.stats.generations)}
+                      {fmtCount(workflow.stats?.runs)}
                       <span>runs</span>
                     </span>
                     <span className="flex items-center gap-1.5">
                       <HeartIcon className="size-3.5" />
-                      {fmtCount(workflow.stats.likes)}
+                      {fmtCount(workflow.stats?.likes)}
                       <span>likes</span>
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <MessageCircleIcon className="size-3.5" />
-                      {fmtCount(workflow.stats.comments)}
-                      <span>comments</span>
-                    </span>
-                    <span className="flex items-center gap-1.5">
                       <BookmarkIcon className="size-3.5" />
-                      {fmtCount(workflow.stats.bookmarks)}
+                      {fmtCount(workflow.stats?.saves)}
                       <span>saves</span>
                     </span>
                   </div>
@@ -240,7 +234,7 @@ export default function WorkflowPage({
           </div>
         ) : (
           <div className="flex gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {workflow?.sampleOutputs.map((src, i) => (
+            {(workflow?.cover_url ? [workflow.cover_url] : []).map((src, i) => (
               <div
                 key={i}
                 className="aspect-video w-64 shrink-0 overflow-hidden rounded-xl bg-muted"
