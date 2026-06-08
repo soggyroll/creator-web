@@ -1,6 +1,9 @@
 /** @format */
 
-import { CreditBalanceResponse, LedgerEntry } from "@/types/api/credits";
+import {
+  CreditBalanceResponse,
+  LedgeHistoryResponse,
+} from "@/types/api/credits";
 import { WorkflowPage, WorkflowResponse } from "@/types/api/workflows";
 import {
   GenerateRequest,
@@ -17,7 +20,7 @@ export const api = {
       const { data } = await apiClient.get("/credits");
       return data;
     },
-    getLedger: async (limit?: number): Promise<LedgerEntry[]> => {
+    getLedger: async (limit?: number): Promise<LedgeHistoryResponse> => {
       const { data } = await apiClient.get("/credits/ledger", {
         params: { limit },
       });
