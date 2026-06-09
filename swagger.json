@@ -70,6 +70,102 @@
                 }
             }
         },
+        "/api/v1/admin/generations": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the most recent generations across the entire system. Requires admin privileges. Supports filtering and cursor pagination.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "List All Generations (Admin)",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Max results (default 20, max 100)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cursor: ID of the last generation from the previous page",
+                        "name": "before",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort column: enqueued_at (default), started_at, finished_at",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by user email",
+                        "name": "email",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status: queued, running, completed, failed, retrying",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by instance ID",
+                        "name": "instance_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by batch ID",
+                        "name": "batch_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.CursorPage-github_com_comfy-creators_creator-backend_internal_service_generation_GenerationResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/admin/instances/db": {
             "get": {
                 "security": [
@@ -358,6 +454,281 @@
                 }
             }
         },
+        "/api/v1/assets": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns uploaded media assets for the active team. Use ?limit= to control count (max 100, default 20). Pass ?before=\u003casset_id\u003e to fetch the next page.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "assets"
+                ],
+                "summary": "List team assets",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Active team UUID",
+                        "name": "X-Team-ID",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Max results (default 20, max 100)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cursor: ID of the last asset from the previous page",
+                        "name": "before",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.AssetListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/assets/uploads/complete": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Verifies that the uploaded object exists in S3, checks available object metadata against the declared upload metadata, and marks the team asset as uploaded.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "assets"
+                ],
+                "summary": "Complete asset upload",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Active team UUID",
+                        "name": "X-Team-ID",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Upload completion request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.CompleteAssetUploadRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.AssetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/assets/uploads/init": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates a pending input asset for the active team and returns a short-lived pre-signed S3 PUT URL for direct client upload. The authenticated user is recorded as the uploader.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "assets"
+                ],
+                "summary": "Initialize asset upload",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Active team UUID",
+                        "name": "X-Team-ID",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Upload metadata",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.InitAssetUploadRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.InitAssetUploadResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/assets/{id}/url": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a short-lived pre-signed S3 GET URL for an uploaded asset that belongs to the active team.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "assets"
+                ],
+                "summary": "Get asset read URL",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Active team UUID",
+                        "name": "X-Team-ID",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Asset UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.AssetURLResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/batches": {
             "get": {
                 "security": [
@@ -365,7 +736,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns the most recent batches for the active team. Use ?limit= to control count (max 100, default 20).",
+                "description": "Returns the most recent batches for the active team. Use ?limit= to control count (max 100, default 20). Pass ?before=\u003cid\u003e to fetch the next page.",
                 "produces": [
                     "application/json"
                 ],
@@ -379,16 +750,19 @@
                         "description": "Max results (default 20, max 100)",
                         "name": "limit",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cursor: ID of the last batch from the previous page",
+                        "name": "before",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Batch"
-                            }
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.CursorPage-github_com_comfy-creators_creator-backend_internal_domain_Batch"
                         }
                     },
                     "500": {
@@ -716,7 +1090,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns the most recent generations for the authenticated user. Use ?limit= to control count (max 100, default 20).",
+                "description": "Returns the most recent generations for the authenticated user. Use ?limit= to control count (max 100, default 20). Pass ?before=\u003cid\u003e to fetch the next page.",
                 "produces": [
                     "application/json"
                 ],
@@ -730,16 +1104,19 @@
                         "description": "Max results (default 20, max 100)",
                         "name": "limit",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cursor: ID of the last generation from the previous page",
+                        "name": "before",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_service_generation.GenerationResult"
-                            }
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.CursorPage-github_com_comfy-creators_creator-backend_internal_service_generation_GenerationResult"
                         }
                     },
                     "500": {
@@ -1571,6 +1948,39 @@
         }
     },
     "definitions": {
+        "github_com_comfy-creators_creator-backend_internal_api_dto.AssetListResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Asset"
+                    }
+                },
+                "next_cursor": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.AssetResponse": {
+            "type": "object",
+            "properties": {
+                "asset": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Asset"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.AssetURLResponse": {
+            "type": "object",
+            "properties": {
+                "expires_at": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_comfy-creators_creator-backend_internal_api_dto.BatchResponse": {
             "type": "object",
             "properties": {
@@ -1582,6 +1992,17 @@
                     "items": {
                         "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Generation"
                     }
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.CompleteAssetUploadRequest": {
+            "type": "object",
+            "required": [
+                "asset_id"
+            ],
+            "properties": {
+                "asset_id": {
+                    "type": "string"
                 }
             }
         },
@@ -1641,6 +2062,42 @@
                 "team_id": {
                     "type": "string",
                     "example": "01932aaa-1234-7000-abcd-ef0123456789"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.CursorPage-github_com_comfy-creators_creator-backend_internal_domain_Batch": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Batch"
+                    }
+                },
+                "next_cursor": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.CursorPage-github_com_comfy-creators_creator-backend_internal_service_generation_GenerationResult": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_service_generation.GenerationResult"
+                    }
+                },
+                "next_cursor": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
                 }
             }
         },
@@ -1724,6 +2181,42 @@
                     "items": {
                         "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_client_mjolnir.InventoryItem"
                     }
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.InitAssetUploadRequest": {
+            "type": "object",
+            "required": [
+                "content_type",
+                "filename",
+                "size_bytes"
+            ],
+            "properties": {
+                "content_type": {
+                    "type": "string"
+                },
+                "filename": {
+                    "type": "string"
+                },
+                "size_bytes": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.InitAssetUploadResponse": {
+            "type": "object",
+            "properties": {
+                "asset_id": {
+                    "type": "string"
+                },
+                "expires_at": {
+                    "type": "string"
+                },
+                "s3_key": {
+                    "type": "string"
+                },
+                "upload_url": {
+                    "type": "string"
                 }
             }
         },
@@ -1966,6 +2459,78 @@
                 "ProviderTypeVastAI",
                 "ProviderTypeMasseCompute",
                 "ProviderTypeHyperstack"
+            ]
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.Asset": {
+            "type": "object",
+            "properties": {
+                "asset_type": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.AssetType"
+                },
+                "content_type": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "expires_at": {
+                    "type": "string"
+                },
+                "generation_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "s3_key": {
+                    "type": "string"
+                },
+                "size_bytes": {
+                    "type": "integer"
+                },
+                "status": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.AssetStatus"
+                },
+                "team_id": {
+                    "type": "string"
+                },
+                "uploaded_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.AssetStatus": {
+            "type": "string",
+            "enum": [
+                "pending",
+                "uploaded",
+                "failed"
+            ],
+            "x-enum-varnames": [
+                "AssetStatusPending",
+                "AssetStatusUploaded",
+                "AssetStatusFailed"
+            ]
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.AssetType": {
+            "type": "string",
+            "enum": [
+                "input",
+                "output",
+                "lora",
+                "checkpoint"
+            ],
+            "x-enum-varnames": [
+                "AssetTypeInput",
+                "AssetTypeOutput",
+                "AssetTypeLora",
+                "AssetTypeCheckpoint"
             ]
         },
         "github_com_comfy-creators_creator-backend_internal_domain.Attachment": {

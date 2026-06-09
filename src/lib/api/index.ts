@@ -10,6 +10,15 @@ import {
   GenerateResponse,
   GenerationResult,
 } from "@/types/api/generations";
+import {
+  AssetListResponse,
+  AssetResponse,
+  AssetURLResponse,
+  CompleteAssetUploadRequest,
+  InitAssetUploadRequest,
+  InitAssetUploadResponse,
+  ListAssetsParams,
+} from "@/types/api/assets";
 import { Team, TeamWithMembership, TeamMember } from "@/types/api/teams";
 import { apiClient } from "../api-client";
 import { Workflow } from "@/types/entities";
@@ -56,6 +65,32 @@ export const api = {
     },
     getMembers: async (id: string): Promise<TeamMember[]> => {
       const { data } = await apiClient.get(`/teams/${id}/members`);
+      return data;
+    },
+  },
+
+  assets: {
+    get: async (params?: ListAssetsParams): Promise<AssetListResponse> => {
+      const { data } = await apiClient.get("/assets", { params });
+      return data;
+    },
+    initUpload: async (
+      request: InitAssetUploadRequest,
+    ): Promise<InitAssetUploadResponse> => {
+      const { data } = await apiClient.post("/assets/uploads/init", request);
+      return data;
+    },
+    completeUpload: async (
+      request: CompleteAssetUploadRequest,
+    ): Promise<AssetResponse> => {
+      const { data } = await apiClient.post(
+        "/assets/uploads/complete",
+        request,
+      );
+      return data;
+    },
+    getUrl: async (id: string): Promise<AssetURLResponse> => {
+      const { data } = await apiClient.get(`/assets/${id}/url`);
       return data;
     },
   },
