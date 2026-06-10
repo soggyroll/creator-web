@@ -9,6 +9,7 @@ import { useTransactionHistory } from "@/hooks/use-transaction-history";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { formatLedgerEntryKind } from "@/lib/utils";
 
 export default function BillingPage() {
   const { data: credits, isLoading: loadingCredits } = useCreditBalance();
@@ -71,7 +72,7 @@ export default function BillingPage() {
               </div>
             ))}
           </div>
-        ) : !transactions?.length ? (
+        ) : !transactions?.data.length ? (
           <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-20 text-center">
             <CoinsIcon className="size-10 opacity-30" />
             <div>
@@ -83,7 +84,7 @@ export default function BillingPage() {
           </div>
         ) : (
           <div className="flex flex-col divide-y rounded-lg border">
-            {transactions.map((tx) => (
+            {transactions.data.map((tx) => (
               <div
                 key={tx.id}
                 className="flex items-center gap-4 px-4 py-3 transition-colors hover:bg-muted/40"
@@ -92,12 +93,12 @@ export default function BillingPage() {
                 <div
                   className={[
                     "flex size-8 shrink-0 items-center justify-center rounded-full",
-                    tx.type === "credit_purchase"
+                    tx.kind !== "charge"
                       ? "bg-green-500/10 text-green-600 dark:text-green-400"
                       : "bg-muted text-muted-foreground",
                   ].join(" ")}
                 >
-                  {tx.type === "credit_purchase" ? (
+                  {tx.kind === "charge" ? (
                     <ArrowDownIcon className="size-3.5" />
                   ) : (
                     <ArrowUpIcon className="size-3.5" />
@@ -106,7 +107,6 @@ export default function BillingPage() {
 
                 {/* Info */}
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm">{tx.description}</p>
                   <p className="mt-0.5 text-xs text-muted-foreground">
                     {new Date(tx.created_at).toLocaleString()}
                   </p>
@@ -116,25 +116,24 @@ export default function BillingPage() {
                 <Badge
                   variant="secondary"
                   className={
-                    tx.type === "credit_purchase"
+                    tx.kind !== "charge"
                       ? "border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400"
                       : ""
                   }
                 >
-                  {tx.type === "credit_purchase" ? "Purchase" : "Spend"}
+                  {formatLedgerEntryKind(tx.kind)}
                 </Badge>
 
                 {/* Amount */}
                 <span
                   className={[
                     "shrink-0 text-sm font-medium tabular-nums",
-                    tx.type === "credit_purchase"
+                    tx.kind === "charge"
                       ? "text-green-700 dark:text-green-400"
                       : "text-muted-foreground",
                   ].join(" ")}
                 >
-                  {tx.type === "credit_purchase" ? "+" : "−"}
-                  {tx.amount.toLocaleString()}
+                  {tx.delta}
                 </span>
               </div>
             ))}

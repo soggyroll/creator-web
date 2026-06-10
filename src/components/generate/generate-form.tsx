@@ -8,11 +8,16 @@ import { useAuth } from "@clerk/nextjs";
 import { ChevronDownIcon, RefreshCwIcon } from "lucide-react";
 import { toast } from "sonner";
 
-import { useWorkflows } from "@/hooks/use-workflows";
 import { useCreateGeneration } from "@/hooks/use-create-generation";
+import { api } from "@/lib/api";
 
 import { Button } from "@/components/ui/button";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -24,11 +29,16 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 
-import { PreviewPanel } from "./preview-panel";
+import { BatchRail } from "./batch-rail";
+import { MediaInputCard } from "./media-input-card";
+import { MediaPreviewDrawer } from "./media-preview-drawer";
 import {
   DEFAULT_FORM_VALUES,
   IMAGE_SIZE_PRESETS,
+  WORKFLOW_MEDIA_INPUTS,
+  type DraftMediaInput,
   type GenerateFormValues,
+  type WorkflowMediaInput,
 } from "./types";
 
 interface GenerateFormProps {
@@ -40,15 +50,73 @@ type BatchPriority = "urgent" | "standard" | "patient";
 interface BatchDraft {
   id: string;
   values: GenerateFormValues;
-  previewUrl: string | null;
+  mediaInputs: Record<string, DraftMediaInput>;
 }
 
 function createDraft(id: string, values = DEFAULT_FORM_VALUES): BatchDraft {
   return {
     id,
     values: { ...values },
-    previewUrl: null,
+    mediaInputs: {},
   };
+}
+
+function createUploadId() {
+  return typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function getFirstMediaInput(draft: BatchDraft) {
+  return Object.values(draft.mediaInputs)[0] ?? null;
+}
+
+function buildWorkflowInputs(mediaInputs: Record<string, DraftMediaInput>) {
+  const asset_ids: Record<string, string> = {};
+
+  Object.values(mediaInputs).forEach((media) => {
+    if (!media.assetId || media.status !== "uploaded") return;
+
+    asset_ids[media.inputId] = media.assetId;
+  });
+
+  return {
+    asset_ids,
+    image_urls: {},
+    primitive_inputs: {},
+  };
+}
+
+function uploadFileToSignedUrl(
+  uploadUrl: string,
+  file: File,
+  onProgress: (progress: number) => void,
+) {
+  return new Promise<void>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+
+    xhr.open("PUT", uploadUrl);
+    xhr.setRequestHeader("Content-Type", file.type);
+
+    xhr.upload.onprogress = (event) => {
+      if (!event.lengthComputable) return;
+      onProgress(Math.round((event.loaded / event.total) * 90));
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onProgress(95);
+        resolve();
+        return;
+      }
+
+      reject(new Error(`Upload failed with status ${xhr.status}.`));
+    };
+
+    xhr.onerror = () => reject(new Error("Upload failed. Please try again."));
+    xhr.onabort = () => reject(new Error("Upload was cancelled."));
+    xhr.send(file);
+  });
 }
 
 export default function GenerateForm({ workflowId }: GenerateFormProps) {
@@ -59,9 +127,10 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
   const nextDraftNumber = useRef(2);
   const [drafts, setDrafts] = useState<BatchDraft[]>([createDraft("draft-1")]);
   const [activeDraftId, setActiveDraftId] = useState("draft-1");
-
-  const { data: workflows } = useWorkflows();
-  const workflow = workflows?.find((w) => w.id === workflowId);
+  const [selectedMediaInputId, setSelectedMediaInputId] = useState(
+    WORKFLOW_MEDIA_INPUTS[0]?.id ?? "",
+  );
+  const [isMediaPreviewOpen, setIsMediaPreviewOpen] = useState(false);
 
   const {
     mutate: createGenerationBatch,
@@ -77,6 +146,11 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
   const readyDrafts = drafts.filter(
     (draft) => draft.values.prompt.trim().length > 0,
   );
+  const allMedia = drafts.flatMap((draft) => Object.values(draft.mediaInputs));
+  const hasUploadingMedia = allMedia.some(
+    (media) => media.status === "uploading",
+  );
+  const hasFailedMedia = allMedia.some((media) => media.status === "failed");
   const isBatchReady = readyDrafts.length === drafts.length;
 
   useEffect(() => {
@@ -103,12 +177,130 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
     );
   }
 
-  function updateActivePreview(previewUrl: string | null) {
+  function updateDraftMediaInput(
+    draftId: string,
+    inputId: string,
+    media: DraftMediaInput | null,
+  ) {
     setDrafts((current) =>
       current.map((draft) =>
-        draft.id === activeDraft.id ? { ...draft, previewUrl } : draft,
+        draft.id === draftId
+          ? {
+              ...draft,
+              mediaInputs: media
+                ? { ...draft.mediaInputs, [inputId]: media }
+                : Object.fromEntries(
+                    Object.entries(draft.mediaInputs).filter(
+                      ([currentInputId]) => currentInputId !== inputId,
+                    ),
+                  ),
+            }
+          : draft,
       ),
     );
+  }
+
+  function patchDraftMediaInput(
+    draftId: string,
+    inputId: string,
+    uploadId: string,
+    patch: Partial<DraftMediaInput>,
+  ) {
+    setDrafts((current) =>
+      current.map((draft) => {
+        if (draft.id !== draftId) return draft;
+
+        const currentMedia = draft.mediaInputs[inputId];
+        if (!currentMedia || currentMedia.uploadId !== uploadId) return draft;
+
+        return {
+          ...draft,
+          mediaInputs: {
+            ...draft.mediaInputs,
+            [inputId]: { ...currentMedia, ...patch },
+          },
+        };
+      }),
+    );
+  }
+
+  async function handleMediaFileSelect(input: WorkflowMediaInput, file: File) {
+    const draftId = activeDraft.id;
+    const previous = activeDraft.mediaInputs[input.id];
+    if (previous?.previewUrl) URL.revokeObjectURL(previous.previewUrl);
+
+    const uploadId = createUploadId();
+
+    updateDraftMediaInput(draftId, input.id, {
+      uploadId,
+      inputId: input.id,
+      fileName: file.name,
+      contentType: file.type,
+      sizeBytes: file.size,
+      previewUrl: URL.createObjectURL(file),
+      progress: 0,
+      status: "uploading",
+    });
+
+    try {
+      const upload = await api.assets.initUpload({
+        filename: file.name,
+        content_type: file.type,
+        size_bytes: file.size,
+      });
+
+      await uploadFileToSignedUrl(upload.upload_url, file, (progress) => {
+        patchDraftMediaInput(draftId, input.id, uploadId, { progress });
+      });
+
+      const completed = await api.assets.completeUpload({
+        asset_id: upload.asset_id,
+      });
+
+      patchDraftMediaInput(draftId, input.id, uploadId, {
+        assetId: completed.asset.id,
+        progress: 100,
+        status: "uploaded",
+      });
+
+      toast.success(`${file.name} uploaded.`);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Upload failed. Try again.";
+
+      patchDraftMediaInput(draftId, input.id, uploadId, {
+        progress: 0,
+        status: "failed",
+        error: message,
+      });
+      toast.error(message);
+    }
+  }
+
+  function handleInvalidMediaFile(
+    input: WorkflowMediaInput,
+    file: File,
+    errorMessage: string,
+  ) {
+    const previous = activeDraft.mediaInputs[input.id];
+    if (previous?.previewUrl) URL.revokeObjectURL(previous.previewUrl);
+
+    updateDraftMediaInput(activeDraft.id, input.id, {
+      inputId: input.id,
+      fileName: file.name,
+      contentType: file.type || "unknown",
+      sizeBytes: file.size,
+      previewUrl: "",
+      progress: 0,
+      status: "failed",
+      error: errorMessage,
+    });
+  }
+
+  function clearMediaInput(input: WorkflowMediaInput) {
+    const previous = activeDraft.mediaInputs[input.id];
+    if (previous?.previewUrl) URL.revokeObjectURL(previous.previewUrl);
+    updateDraftMediaInput(activeDraft.id, input.id, null);
   }
 
   function addDraft() {
@@ -125,7 +317,7 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
     const duplicate = {
       id: duplicateId,
       values: { ...source.values },
-      previewUrl: null,
+      mediaInputs: {},
     };
 
     setDrafts((current) => {
@@ -141,7 +333,9 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
     if (drafts.length === 1) return;
 
     const draft = drafts.find((item) => item.id === id);
-    if (draft?.previewUrl) URL.revokeObjectURL(draft.previewUrl);
+    Object.values(draft?.mediaInputs ?? {}).forEach((media) => {
+      if (media.previewUrl) URL.revokeObjectURL(media.previewUrl);
+    });
 
     setDrafts((current) => current.filter((item) => item.id !== id));
     if (activeDraftId === id) {
@@ -151,7 +345,9 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
   }
 
   function resetActiveDraft() {
-    if (activeDraft.previewUrl) URL.revokeObjectURL(activeDraft.previewUrl);
+    Object.values(activeDraft.mediaInputs).forEach((media) => {
+      if (media.previewUrl) URL.revokeObjectURL(media.previewUrl);
+    });
     setDrafts((current) =>
       current.map((draft) =>
         draft.id === activeDraft.id
@@ -175,24 +371,26 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
       return;
     }
 
+    if (hasUploadingMedia) {
+      toast.error("Wait for media uploads to finish before running.");
+      return;
+    }
+
+    if (hasFailedMedia) {
+      toast.error("Clear or replace failed media before running.");
+      return;
+    }
+
     const generations = drafts.map((draft) => ({
       prompt: draft.values.prompt.trim(),
+      workflow_id: workflowId,
+      inputs: buildWorkflowInputs(draft.mediaInputs),
     }));
 
     createGenerationBatch(
-      // TODO: map to real request body when API is ready
       {
-        generations: [
-          {
-            prompt: generations[0].prompt,
-            workflow_id: workflowId,
-            attachments: [
-              { type: "image", url: "https://placekitten.com/400/400" },
-            ],
-            inputs: {},
-          },
-        ],
-        priority: "urgent",
+        generations,
+        priority,
       },
       {
         onSuccess: () => {
@@ -207,30 +405,46 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
     );
   }
 
-  const sampleImages = workflow?.cover_url ? [workflow.cover_url] : [];
   const values = activeDraft.values;
+
+  const selectedMediaInput =
+    WORKFLOW_MEDIA_INPUTS.find((input) => input.id === selectedMediaInputId) ??
+    WORKFLOW_MEDIA_INPUTS[0];
+
+  const selectedMedia = selectedMediaInput
+    ? activeDraft.mediaInputs[selectedMediaInput.id]
+    : undefined;
+
   const selectedPreset =
     IMAGE_SIZE_PRESETS.find(
       (preset) => preset.value === values.imageSizePreset,
     ) ?? IMAGE_SIZE_PRESETS[1];
-  const canSubmit = !isSignedIn || (!isPending && isBatchReady);
+
+  const canSubmit =
+    !isSignedIn ||
+    (!isPending && isBatchReady && !hasUploadingMedia && !hasFailedMedia);
+
   const runLabel = !isSignedIn
     ? "Sign in to run"
     : isPending
       ? "Running..."
-      : `Run batch (${drafts.length})`;
+      : hasUploadingMedia
+        ? "Uploading media..."
+        : hasFailedMedia
+          ? "Fix failed media"
+          : `Run batch (${drafts.length})`;
 
   return (
-    <div className="flex h-[calc(100vh-56px)] flex-col overflow-hidden border">
+    <div className="flex h-[calc(100vh-164px)] min-h-160 flex-col overflow-hidden">
       <form
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
         }}
-        className="flex flex-1 overflow-hidden"
+        className="flex min-h-0 flex-1 flex-col gap-6 overflow-hidden lg:flex-row"
       >
-        <div className="flex w-[45%] shrink-0 flex-col overflow-y-auto border-r border-border pt-5 scrollbar-hide">
-          <div className="px-6 pb-4">
+        <div className="min-w-0 flex-1 overflow-y-auto pr-2 scrollbar-hide">
+          <div className="mx-auto max-w-3xl pb-10">
             <div className="mb-4 flex items-center justify-between">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Generation #{activeIndex + 1}
@@ -260,6 +474,36 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
                   }
                   autoFocus
                 />
+              </Field>
+            </FieldGroup>
+
+            <FieldGroup className="mb-5">
+              <Field>
+                <div>
+                  <FieldLabel>Workflow inputs</FieldLabel>
+                  <FieldDescription>
+                    Add media directly to the workflow slot that uses it.
+                  </FieldDescription>
+                </div>
+                <div className="flex flex-col gap-3">
+                  {WORKFLOW_MEDIA_INPUTS.map((input) => (
+                    <MediaInputCard
+                      key={input.id}
+                      input={input}
+                      media={activeDraft.mediaInputs[input.id]}
+                      selected={selectedMediaInputId === input.id}
+                      onSelect={() => setSelectedMediaInputId(input.id)}
+                      onPreview={() => setIsMediaPreviewOpen(true)}
+                      onFileSelect={(file) =>
+                        handleMediaFileSelect(input, file)
+                      }
+                      onInvalidFile={(file, errorMessage) =>
+                        handleInvalidMediaFile(input, file, errorMessage)
+                      }
+                      onClear={() => clearMediaInput(input)}
+                    />
+                  ))}
+                </div>
               </Field>
             </FieldGroup>
 
@@ -422,14 +666,12 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
           </div>
         </div>
 
-        <PreviewPanel
-          sampleImages={sampleImages}
-          previewUrl={activeDraft.previewUrl}
-          onPreviewUrlChange={updateActivePreview}
+        <BatchRail
           batchItems={drafts.map((draft) => ({
             id: draft.id,
             prompt: draft.values.prompt,
-            previewUrl: draft.previewUrl,
+            previewUrl: getFirstMediaInput(draft)?.previewUrl ?? null,
+            mediaStatus: getFirstMediaInput(draft)?.status ?? "idle",
           }))}
           activeItemId={activeDraft.id}
           priority={priority}
@@ -442,6 +684,18 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
           onPriorityChange={(value) => setPriority(value as BatchPriority)}
         />
       </form>
+
+      <MediaPreviewDrawer
+        input={selectedMediaInput}
+        media={selectedMedia}
+        open={isMediaPreviewOpen}
+        onOpenChange={setIsMediaPreviewOpen}
+        onClear={
+          selectedMediaInput
+            ? () => clearMediaInput(selectedMediaInput)
+            : undefined
+        }
+      />
     </div>
   );
 }

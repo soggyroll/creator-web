@@ -10,7 +10,7 @@ export function useDashboardStats() {
   const { data: credits, isLoading: loadingCredits } = useCreditBalance();
 
   const active =
-    generations?.filter(
+    generations?.data.filter(
       (g) =>
         g.generation?.status === "queued" ||
         g.generation?.status === "running" ||
@@ -18,12 +18,12 @@ export function useDashboardStats() {
     ).length ?? 0;
 
   const completed =
-    generations?.filter((g) => g.generation?.status === "completed").length ??
-    0;
+    generations?.data.filter((g) => g.generation?.status === "completed")
+      .length ?? 0;
 
   return {
     credits: credits?.balance,
-    total: generations?.length ?? 0,
+    total: generations?.data.length ?? 0,
     active,
     completed,
     isLoading: loadingGens || loadingCredits,

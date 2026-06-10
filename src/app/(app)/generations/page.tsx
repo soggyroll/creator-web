@@ -40,7 +40,7 @@ export default function GenerationsPage() {
             </div>
           ))}
         </div>
-      ) : !generations?.length ? (
+      ) : !generations?.data?.length ? (
         <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-20 text-center">
           <ImageIcon className="size-10 opacity-30" />
           <div>
@@ -55,9 +55,9 @@ export default function GenerationsPage() {
         </div>
       ) : (
         <div className="flex flex-col divide-y rounded-lg border">
-          {generations.map((item) => {
+          {generations.data.map((item) => {
             const gen = item.generation;
-            const thumbnail = gen?.attachments?.find(
+            const thumbnail = gen.attachments?.find(
               (a) => a.type === "image",
             )?.url;
 

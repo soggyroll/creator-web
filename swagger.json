@@ -70,6 +70,102 @@
                 }
             }
         },
+        "/api/v1/admin/generations": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the most recent generations across the entire system. Requires admin privileges. Supports filtering and cursor pagination.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "List All Generations (Admin)",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Max results (default 20, max 100)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cursor: ID of the last generation from the previous page",
+                        "name": "before",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort column: enqueued_at (default), started_at, finished_at",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by user email",
+                        "name": "email",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status: queued, running, completed, failed, retrying",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by instance ID",
+                        "name": "instance_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by batch ID",
+                        "name": "batch_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.CursorPage-github_com_comfy-creators_creator-backend_internal_service_generation_GenerationResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/admin/instances/db": {
             "get": {
                 "security": [
@@ -358,6 +454,281 @@
                 }
             }
         },
+        "/api/v1/assets": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns uploaded media assets for the active team. Use ?limit= to control count (max 100, default 20). Pass ?before=\u003casset_id\u003e to fetch the next page.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "assets"
+                ],
+                "summary": "List team assets",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Active team UUID",
+                        "name": "X-Team-ID",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Max results (default 20, max 100)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cursor: ID of the last asset from the previous page",
+                        "name": "before",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.AssetListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/assets/uploads/complete": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Verifies that the uploaded object exists in S3, checks available object metadata against the declared upload metadata, and marks the team asset as uploaded.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "assets"
+                ],
+                "summary": "Complete asset upload",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Active team UUID",
+                        "name": "X-Team-ID",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Upload completion request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.CompleteAssetUploadRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.AssetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/assets/uploads/init": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates a pending input asset for the active team and returns a short-lived pre-signed S3 PUT URL for direct client upload. The authenticated user is recorded as the uploader.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "assets"
+                ],
+                "summary": "Initialize asset upload",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Active team UUID",
+                        "name": "X-Team-ID",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Upload metadata",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.InitAssetUploadRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.InitAssetUploadResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/assets/{id}/url": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a short-lived pre-signed S3 GET URL for an uploaded asset that belongs to the active team.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "assets"
+                ],
+                "summary": "Get asset read URL",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Active team UUID",
+                        "name": "X-Team-ID",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Asset UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.AssetURLResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/batches": {
             "get": {
                 "security": [
@@ -365,7 +736,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns the most recent batches for the active team. Use ?limit= to control count (max 100, default 20).",
+                "description": "Returns the most recent batches for the active team. Use ?limit= to control count (max 100, default 20). Pass ?before=\u003cid\u003e to fetch the next page.",
                 "produces": [
                     "application/json"
                 ],
@@ -379,16 +750,19 @@
                         "description": "Max results (default 20, max 100)",
                         "name": "limit",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cursor: ID of the last batch from the previous page",
+                        "name": "before",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Batch"
-                            }
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.CursorPage-github_com_comfy-creators_creator-backend_internal_domain_Batch"
                         }
                     },
                     "500": {
@@ -697,6 +1071,24 @@
                             }
                         }
                     },
+                    "402": {
+                        "description": "Payment Required",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -716,7 +1108,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns the most recent generations for the authenticated user. Use ?limit= to control count (max 100, default 20).",
+                "description": "Returns the most recent generations for the authenticated user. Use ?limit= to control count (max 100, default 20). Pass ?before=\u003cid\u003e to fetch the next page.",
                 "produces": [
                     "application/json"
                 ],
@@ -730,16 +1122,19 @@
                         "description": "Max results (default 20, max 100)",
                         "name": "limit",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cursor: ID of the last generation from the previous page",
+                        "name": "before",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_service_generation.GenerationResult"
-                            }
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.CursorPage-github_com_comfy-creators_creator-backend_internal_service_generation_GenerationResult"
                         }
                     },
                     "500": {
@@ -1571,8 +1966,56 @@
         }
     },
     "definitions": {
+        "github_com_comfy-creators_creator-backend_internal_api_dto.AssetListResponse": {
+            "type": "object",
+            "required": [
+                "data",
+                "next_cursor"
+            ],
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Asset"
+                    }
+                },
+                "next_cursor": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.AssetResponse": {
+            "type": "object",
+            "required": [
+                "asset"
+            ],
+            "properties": {
+                "asset": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Asset"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.AssetURLResponse": {
+            "type": "object",
+            "required": [
+                "expires_at",
+                "url"
+            ],
+            "properties": {
+                "expires_at": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_comfy-creators_creator-backend_internal_api_dto.BatchResponse": {
             "type": "object",
+            "required": [
+                "batch",
+                "generations"
+            ],
             "properties": {
                 "batch": {
                     "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Batch"
@@ -1585,11 +2028,30 @@
                 }
             }
         },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.CompleteAssetUploadRequest": {
+            "type": "object",
+            "required": [
+                "asset_id"
+            ],
+            "properties": {
+                "asset_id": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_comfy-creators_creator-backend_internal_api_dto.CreateWorkflowRequest": {
             "type": "object",
             "required": [
+                "avg_time",
                 "comfy_workflow",
-                "name"
+                "cost",
+                "cover_url",
+                "default_timeout_seconds",
+                "description",
+                "is_public",
+                "model_files",
+                "name",
+                "required_vram_gb"
             ],
             "properties": {
                 "avg_time": {
@@ -1633,6 +2095,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_api_dto.CreditBalanceResponse": {
             "type": "object",
+            "required": [
+                "balance",
+                "team_id"
+            ],
             "properties": {
                 "balance": {
                     "type": "integer",
@@ -1641,6 +2107,53 @@
                 "team_id": {
                     "type": "string",
                     "example": "01932aaa-1234-7000-abcd-ef0123456789"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.CursorPage-github_com_comfy-creators_creator-backend_internal_domain_Batch": {
+            "type": "object",
+            "required": [
+                "data",
+                "next_cursor"
+            ],
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Batch"
+                    }
+                },
+                "next_cursor": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.CursorPage-github_com_comfy-creators_creator-backend_internal_service_generation_GenerationResult": {
+            "type": "object",
+            "required": [
+                "data",
+                "next_cursor"
+            ],
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_service_generation.GenerationResult"
+                    }
+                },
+                "next_cursor": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse": {
+            "type": "object",
+            "required": [
+                "error"
+            ],
+            "properties": {
+                "error": {
+                    "type": "string"
                 }
             }
         },
@@ -1655,7 +2168,7 @@
                     "type": "array",
                     "minItems": 1,
                     "items": {
-                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_service_generation.GenerationInput"
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.GenerationInputBody"
                     }
                 },
                 "priority": {
@@ -1665,6 +2178,11 @@
         },
         "github_com_comfy-creators_creator-backend_internal_api_dto.GenerateResponse": {
             "type": "object",
+            "required": [
+                "batch_id",
+                "generation_ids",
+                "status"
+            ],
             "properties": {
                 "batch_id": {
                     "type": "string",
@@ -1682,8 +2200,31 @@
                 }
             }
         },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.GenerationInputBody": {
+            "type": "object",
+            "required": [
+                "inputs",
+                "prompt",
+                "workflow_id"
+            ],
+            "properties": {
+                "inputs": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.WorkflowInputsBody"
+                },
+                "prompt": {
+                    "type": "string"
+                },
+                "workflow_id": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_comfy-creators_creator-backend_internal_api_dto.GetActiveInstancesDbResponse": {
             "type": "object",
+            "required": [
+                "count",
+                "instances"
+            ],
             "properties": {
                 "count": {
                     "type": "integer",
@@ -1699,6 +2240,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_api_dto.GetActiveInstancesLiveResponse": {
             "type": "object",
+            "required": [
+                "count",
+                "instances"
+            ],
             "properties": {
                 "count": {
                     "type": "integer",
@@ -1714,6 +2259,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_api_dto.GetInventoryResponse": {
             "type": "object",
+            "required": [
+                "count",
+                "instances"
+            ],
             "properties": {
                 "count": {
                     "type": "integer",
@@ -1724,6 +2273,48 @@
                     "items": {
                         "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_client_mjolnir.InventoryItem"
                     }
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.InitAssetUploadRequest": {
+            "type": "object",
+            "required": [
+                "content_type",
+                "filename",
+                "size_bytes"
+            ],
+            "properties": {
+                "content_type": {
+                    "type": "string"
+                },
+                "filename": {
+                    "type": "string"
+                },
+                "size_bytes": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.InitAssetUploadResponse": {
+            "type": "object",
+            "required": [
+                "asset_id",
+                "expires_at",
+                "s3_key",
+                "upload_url"
+            ],
+            "properties": {
+                "asset_id": {
+                    "type": "string"
+                },
+                "expires_at": {
+                    "type": "string"
+                },
+                "s3_key": {
+                    "type": "string"
+                },
+                "upload_url": {
+                    "type": "string"
                 }
             }
         },
@@ -1744,6 +2335,18 @@
         },
         "github_com_comfy-creators_creator-backend_internal_api_dto.UpdateWorkflowRequest": {
             "type": "object",
+            "required": [
+                "avg_time",
+                "comfy_workflow",
+                "cost",
+                "cover_url",
+                "default_timeout_seconds",
+                "description",
+                "is_public",
+                "model_files",
+                "name",
+                "required_vram_gb"
+            ],
             "properties": {
                 "avg_time": {
                     "type": "integer"
@@ -1780,8 +2383,37 @@
                 }
             }
         },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.WorkflowInputsBody": {
+            "type": "object",
+            "required": [
+                "asset_ids",
+                "image_urls",
+                "primitive_inputs"
+            ],
+            "properties": {
+                "asset_ids": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "image_urls": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "primitive_inputs": {
+                    "type": "object",
+                    "additionalProperties": {}
+                }
+            }
+        },
         "github_com_comfy-creators_creator-backend_internal_api_dto.WorkflowResponse": {
             "type": "object",
+            "required": [
+                "workflow"
+            ],
             "properties": {
                 "workflow": {
                     "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Workflow"
@@ -1790,6 +2422,9 @@
         },
         "github_com_comfy-creators_creator-backend_internal_api_dto.WorkflowViewResponse": {
             "type": "object",
+            "required": [
+                "workflow"
+            ],
             "properties": {
                 "workflow": {
                     "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.WorkflowView"
@@ -1798,6 +2433,19 @@
         },
         "github_com_comfy-creators_creator-backend_internal_client_mjolnir.Instance": {
             "type": "object",
+            "required": [
+                "created_at",
+                "details",
+                "id",
+                "internal_ip",
+                "location",
+                "name",
+                "network",
+                "provider",
+                "public_ip",
+                "status",
+                "type"
+            ],
             "properties": {
                 "created_at": {
                     "type": "string"
@@ -1843,6 +2491,11 @@
         },
         "github_com_comfy-creators_creator-backend_internal_client_mjolnir.InstanceDetails": {
             "type": "object",
+            "required": [
+                "node_count",
+                "original",
+                "ports"
+            ],
             "properties": {
                 "node_count": {
                     "type": "integer"
@@ -1878,9 +2531,27 @@
         },
         "github_com_comfy-creators_creator-backend_internal_client_mjolnir.InventoryItem": {
             "type": "object",
+            "required": [
+                "gpu",
+                "instance",
+                "location",
+                "original",
+                "price_per_hour",
+                "provider",
+                "ram",
+                "storage",
+                "type",
+                "vcpu"
+            ],
             "properties": {
                 "gpu": {
                     "type": "object",
+                    "required": [
+                        "available",
+                        "interface",
+                        "model",
+                        "vram"
+                    ],
                     "properties": {
                         "available": {
                             "type": "integer"
@@ -1898,6 +2569,10 @@
                 },
                 "instance": {
                     "type": "object",
+                    "required": [
+                        "gpu_count",
+                        "id"
+                    ],
                     "properties": {
                         "gpu_count": {
                             "type": "integer"
@@ -1916,6 +2591,10 @@
                 },
                 "price_per_hour": {
                     "type": "object",
+                    "required": [
+                        "currency",
+                        "fixed"
+                    ],
                     "properties": {
                         "currency": {
                             "type": "string"
@@ -1944,6 +2623,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_client_mjolnir.InventoryLocation": {
             "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
             "properties": {
                 "id": {
                     "type": "string"
@@ -1968,8 +2651,96 @@
                 "ProviderTypeHyperstack"
             ]
         },
+        "github_com_comfy-creators_creator-backend_internal_domain.Asset": {
+            "type": "object",
+            "required": [
+                "asset_type",
+                "content_type",
+                "created_at",
+                "id",
+                "name",
+                "s3_key",
+                "size_bytes",
+                "status",
+                "team_id",
+                "user_id"
+            ],
+            "properties": {
+                "asset_type": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.AssetType"
+                },
+                "content_type": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "expires_at": {
+                    "type": "string"
+                },
+                "generation_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "s3_key": {
+                    "type": "string"
+                },
+                "size_bytes": {
+                    "type": "integer"
+                },
+                "status": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.AssetStatus"
+                },
+                "team_id": {
+                    "type": "string"
+                },
+                "uploaded_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.AssetStatus": {
+            "type": "string",
+            "enum": [
+                "pending",
+                "uploaded",
+                "failed"
+            ],
+            "x-enum-varnames": [
+                "AssetStatusPending",
+                "AssetStatusUploaded",
+                "AssetStatusFailed"
+            ]
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.AssetType": {
+            "type": "string",
+            "enum": [
+                "input",
+                "output",
+                "lora",
+                "checkpoint"
+            ],
+            "x-enum-varnames": [
+                "AssetTypeInput",
+                "AssetTypeOutput",
+                "AssetTypeLora",
+                "AssetTypeCheckpoint"
+            ]
+        },
         "github_com_comfy-creators_creator-backend_internal_domain.Attachment": {
             "type": "object",
+            "required": [
+                "type",
+                "url"
+            ],
             "properties": {
                 "type": {
                     "type": "string"
@@ -1981,6 +2752,14 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.Batch": {
             "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "priority",
+                "status",
+                "team_id",
+                "user_id"
+            ],
             "properties": {
                 "completed_at": {
                     "type": "string"
@@ -2048,6 +2827,22 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.Generation": {
             "type": "object",
+            "required": [
+                "attachments",
+                "batch_id",
+                "enqueued_at",
+                "execution_stage",
+                "id",
+                "priority",
+                "prompt",
+                "retry_count",
+                "runtime_status",
+                "status",
+                "team_id",
+                "user_id",
+                "workflow_id",
+                "workflow_inputs"
+            ],
             "properties": {
                 "attachments": {
                     "description": "Ignored by DB, handled manually via JSONB byte mapping in Repo.",
@@ -2140,6 +2935,16 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.Instance": {
             "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "instance_type",
+                "load_score",
+                "provider",
+                "provider_instance_id",
+                "state",
+                "vram_gb"
+            ],
             "properties": {
                 "closed_at": {
                     "type": "string"
@@ -2219,6 +3024,14 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.LedgerEntry": {
             "type": "object",
+            "required": [
+                "created_at",
+                "delta",
+                "id",
+                "kind",
+                "team_id",
+                "user_id"
+            ],
             "properties": {
                 "created_at": {
                     "type": "string"
@@ -2268,6 +3081,12 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.Team": {
             "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "name",
+                "updated_at"
+            ],
             "properties": {
                 "archived_at": {
                     "type": "string"
@@ -2294,6 +3113,15 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.TeamMember": {
             "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "role",
+                "status",
+                "team_id",
+                "updated_at",
+                "user_id"
+            ],
             "properties": {
                 "created_at": {
                     "type": "string"
@@ -2332,6 +3160,14 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.TeamWithMembership": {
             "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "name",
+                "role",
+                "status",
+                "updated_at"
+            ],
             "properties": {
                 "archived_at": {
                     "type": "string"
@@ -2367,6 +3203,13 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.User": {
             "type": "object",
+            "required": [
+                "created_at",
+                "email",
+                "id",
+                "name",
+                "updated_at"
+            ],
             "properties": {
                 "avatar_url": {
                     "type": "string"
@@ -2390,6 +3233,21 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.Workflow": {
             "type": "object",
+            "required": [
+                "avg_time",
+                "comfy_workflow",
+                "cost",
+                "created_at",
+                "default_timeout_seconds",
+                "id",
+                "is_public",
+                "model_files",
+                "name",
+                "required_vram_gb",
+                "team_id",
+                "updated_at",
+                "user_id"
+            ],
             "properties": {
                 "avg_time": {
                     "type": "integer"
@@ -2443,7 +3301,17 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.WorkflowInputs": {
             "type": "object",
+            "required": [
+                "image_urls",
+                "primitive_inputs"
+            ],
             "properties": {
+                "asset_ids": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
                 "image_urls": {
                     "type": "object",
                     "additionalProperties": {
@@ -2458,6 +3326,13 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.WorkflowPage": {
             "type": "object",
+            "required": [
+                "data",
+                "has_more",
+                "limit",
+                "offset",
+                "total_count"
+            ],
             "properties": {
                 "data": {
                     "type": "array",
@@ -2481,6 +3356,11 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.WorkflowStats": {
             "type": "object",
+            "required": [
+                "likes",
+                "runs",
+                "saves"
+            ],
             "properties": {
                 "likes": {
                     "type": "integer"
@@ -2495,6 +3375,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.WorkflowTeamRef": {
             "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
             "properties": {
                 "id": {
                     "type": "string"
@@ -2506,6 +3390,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.WorkflowUserRef": {
             "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
             "properties": {
                 "id": {
                     "type": "string"
@@ -2517,6 +3405,18 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.WorkflowView": {
             "type": "object",
+            "required": [
+                "avg_time",
+                "cost",
+                "created_at",
+                "id",
+                "name",
+                "stats",
+                "team",
+                "updated_at",
+                "user",
+                "viewer"
+            ],
             "properties": {
                 "avg_time": {
                     "type": "integer"
@@ -2558,6 +3458,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.WorkflowViewer": {
             "type": "object",
+            "required": [
+                "liked",
+                "saved"
+            ],
             "properties": {
                 "liked": {
                     "type": "boolean"
@@ -2567,31 +3471,11 @@
                 }
             }
         },
-        "github_com_comfy-creators_creator-backend_internal_service_generation.GenerationInput": {
-            "type": "object",
-            "required": [
-                "workflow_id"
-            ],
-            "properties": {
-                "attachments": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Attachment"
-                    }
-                },
-                "inputs": {
-                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.WorkflowInputs"
-                },
-                "prompt": {
-                    "type": "string"
-                },
-                "workflow_id": {
-                    "type": "string"
-                }
-            }
-        },
         "github_com_comfy-creators_creator-backend_internal_service_generation.GenerationResult": {
             "type": "object",
+            "required": [
+                "generation"
+            ],
             "properties": {
                 "generation": {
                     "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Generation"

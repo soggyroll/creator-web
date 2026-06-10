@@ -24,10 +24,18 @@ export interface Generation {
   workflow_inputs?: WorkflowInputs;
 }
 
-export interface GenerationResult {
+export interface GenerationResponse {
   generation: Generation;
   output_expiry?: string;
   output_url?: string;
+}
+
+export interface ListGenerationResponse {
+  data: {
+    generation: Generation;
+    output_expiry?: string;
+    output_url?: string;
+  }[];
 }
 
 export interface Attachment {
@@ -39,14 +47,20 @@ export type FaultSource = string;
 export type BatchPriority = "urgent" | "standard" | "patient";
 export type GenerationStatus = string;
 export interface WorkflowInputs {
-  image_urls?: Record<string, string>;
-  primitive_inputs?: Record<string, unknown>;
+  asset_ids?: Record<string, string>;
+  image_urls: Record<string, string>;
+  primitive_inputs: Record<string, unknown>;
+}
+
+export interface WorkflowInputsBody {
+  asset_ids: Record<string, string>;
+  image_urls: Record<string, string>;
+  primitive_inputs: Record<string, unknown>;
 }
 
 export interface GenerationInput {
-  attachments?: Attachment[];
-  inputs?: WorkflowInputs;
-  prompt?: string;
+  inputs: WorkflowInputsBody;
+  prompt: string;
   workflow_id: string;
 }
 
@@ -56,7 +70,7 @@ export interface GenerateRequest {
 }
 
 export interface GenerateResponse {
-  batch_id?: string;
-  generation_ids?: string[];
-  status?: string;
+  batch_id: string;
+  generation_ids: string[];
+  status: string;
 }

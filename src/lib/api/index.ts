@@ -1,12 +1,25 @@
 /** @format */
 
-import { CreditBalanceResponse, LedgerEntry } from "@/types/api/credits";
+import {
+  CreditBalanceResponse,
+  LedgeHistoryResponse,
+} from "@/types/api/credits";
 import { WorkflowPage, WorkflowResponse } from "@/types/api/workflows";
 import {
   GenerateRequest,
   GenerateResponse,
-  GenerationResult,
+  GenerationResponse,
+  ListGenerationResponse,
 } from "@/types/api/generations";
+import {
+  AssetListResponse,
+  AssetResponse,
+  AssetURLResponse,
+  CompleteAssetUploadRequest,
+  InitAssetUploadRequest,
+  InitAssetUploadResponse,
+  ListAssetsParams,
+} from "@/types/api/assets";
 import { Team, TeamWithMembership, TeamMember } from "@/types/api/teams";
 import { apiClient } from "../api-client";
 import { Workflow } from "@/types/entities";
@@ -17,7 +30,7 @@ export const api = {
       const { data } = await apiClient.get("/credits");
       return data;
     },
-    getLedger: async (limit?: number): Promise<LedgerEntry[]> => {
+    getLedger: async (limit?: number): Promise<LedgeHistoryResponse> => {
       const { data } = await apiClient.get("/credits/ledger", {
         params: { limit },
       });
@@ -27,16 +40,19 @@ export const api = {
 
   generations: {
     create: async (request: GenerateRequest): Promise<GenerateResponse> => {
-      const { data } = await apiClient.post("/generate", request);
+      const { data } = await apiClient.post<GenerateResponse>(
+        "/generate",
+        request,
+      );
       return data;
     },
-    get: async (limit?: number): Promise<GenerationResult[]> => {
+    get: async (limit?: number): Promise<ListGenerationResponse> => {
       const { data } = await apiClient.get("/generations", {
         params: { limit },
       });
       return data;
     },
-    getById: async (id: string): Promise<GenerationResult> => {
+    getById: async (id: string): Promise<GenerationResponse> => {
       const { data } = await apiClient.get(`/generations/${id}`);
       return data;
     },
@@ -53,6 +69,32 @@ export const api = {
     },
     getMembers: async (id: string): Promise<TeamMember[]> => {
       const { data } = await apiClient.get(`/teams/${id}/members`);
+      return data;
+    },
+  },
+
+  assets: {
+    get: async (params?: ListAssetsParams): Promise<AssetListResponse> => {
+      const { data } = await apiClient.get("/assets", { params });
+      return data;
+    },
+    initUpload: async (
+      request: InitAssetUploadRequest,
+    ): Promise<InitAssetUploadResponse> => {
+      const { data } = await apiClient.post("/assets/uploads/init", request);
+      return data;
+    },
+    completeUpload: async (
+      request: CompleteAssetUploadRequest,
+    ): Promise<AssetResponse> => {
+      const { data } = await apiClient.post(
+        "/assets/uploads/complete",
+        request,
+      );
+      return data;
+    },
+    getUrl: async (id: string): Promise<AssetURLResponse> => {
+      const { data } = await apiClient.get(`/assets/${id}/url`);
       return data;
     },
   },
