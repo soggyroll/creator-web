@@ -39,8 +39,10 @@ export type FaultSource = string;
 export type BatchPriority = "urgent" | "standard" | "patient";
 export type GenerationStatus = string;
 export interface WorkflowInputs {
+  image_asset_ids?: Record<string, string>;
   image_urls?: Record<string, string>;
   primitive_inputs?: Record<string, unknown>;
+  video_asset_ids?: Record<string, string>;
 }
 
 export interface GenerationInput {

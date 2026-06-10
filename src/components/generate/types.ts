@@ -10,6 +10,36 @@ export interface GenerateFormValues {
   numImages: number;
 }
 
+export type MediaInputKind = "image" | "video" | "media";
+
+export interface WorkflowMediaInput {
+  id: string;
+  label: string;
+  description?: string;
+  kind: MediaInputKind;
+  required?: boolean;
+  accept: string[];
+}
+
+export type MediaInputStatus =
+  | "idle"
+  | "ready"
+  | "uploading"
+  | "uploaded"
+  | "failed";
+
+export interface DraftMediaInput {
+  inputId: string;
+  fileName: string;
+  contentType: string;
+  sizeBytes: number;
+  previewUrl: string;
+  progress: number;
+  status: MediaInputStatus;
+  assetId?: string;
+  error?: string;
+}
+
 export const DEFAULT_FORM_VALUES: GenerateFormValues = {
   prompt: "",
   negativePrompt: "",
@@ -33,3 +63,20 @@ export const IMAGE_SIZE_PRESETS = [
     height: 576,
   },
 ] as const;
+
+export const WORKFLOW_MEDIA_INPUTS: WorkflowMediaInput[] = [
+  {
+    id: "reference_media",
+    label: "Reference media",
+    description: "Image or video input for this workflow",
+    kind: "media",
+    accept: [
+      "image/png",
+      "image/jpeg",
+      "image/webp",
+      "video/mp4",
+      "video/webm",
+      "video/quicktime",
+    ],
+  },
+];
