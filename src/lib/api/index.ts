@@ -8,7 +8,8 @@ import { WorkflowPage, WorkflowResponse } from "@/types/api/workflows";
 import {
   GenerateRequest,
   GenerateResponse,
-  GenerationResult,
+  GenerationResponse,
+  ListGenerationResponse,
 } from "@/types/api/generations";
 import {
   AssetListResponse,
@@ -45,13 +46,13 @@ export const api = {
       );
       return data;
     },
-    get: async (limit?: number): Promise<GenerationResult[]> => {
+    get: async (limit?: number): Promise<ListGenerationResponse> => {
       const { data } = await apiClient.get("/generations", {
         params: { limit },
       });
       return data;
     },
-    getById: async (id: string): Promise<GenerationResult> => {
+    getById: async (id: string): Promise<GenerationResponse> => {
       const { data } = await apiClient.get(`/generations/${id}`);
       return data;
     },

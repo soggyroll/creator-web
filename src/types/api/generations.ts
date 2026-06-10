@@ -24,10 +24,18 @@ export interface Generation {
   workflow_inputs?: WorkflowInputs;
 }
 
-export interface GenerationResult {
+export interface GenerationResponse {
   generation: Generation;
   output_expiry?: string;
   output_url?: string;
+}
+
+export interface ListGenerationResponse {
+  data: {
+    generation: Generation;
+    output_expiry?: string;
+    output_url?: string;
+  }[];
 }
 
 export interface Attachment {
