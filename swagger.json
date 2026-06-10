@@ -1071,6 +1071,24 @@
                             }
                         }
                     },
+                    "402": {
+                        "description": "Payment Required",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -3009,6 +3027,12 @@
         "github_com_comfy-creators_creator-backend_internal_domain.WorkflowInputs": {
             "type": "object",
             "properties": {
+                "asset_ids": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
                 "image_urls": {
                     "type": "object",
                     "additionalProperties": {

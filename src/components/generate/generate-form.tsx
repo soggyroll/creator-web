@@ -74,24 +74,18 @@ function getFirstMediaInput(draft: BatchDraft) {
 }
 
 function buildWorkflowInputs(mediaInputs: Record<string, DraftMediaInput>) {
-  const image_asset_ids: Record<string, string> = {};
-  const video_asset_ids: Record<string, string> = {};
+  const asset_ids: Record<string, string> = {};
 
   Object.values(mediaInputs).forEach((media) => {
     if (!media.assetId || media.status === "failed") return;
 
-    if (media.contentType.startsWith("video/")) {
-      video_asset_ids[media.inputId] = media.assetId;
-      return;
-    }
-
-    image_asset_ids[media.inputId] = media.assetId;
+    asset_ids[media.inputId] = media.assetId;
   });
 
   return {
     primitive_inputs: {},
-    ...(Object.keys(image_asset_ids).length ? { image_asset_ids } : {}),
-    ...(Object.keys(video_asset_ids).length ? { video_asset_ids } : {}),
+    image_urls: {},
+    ...(Object.keys(asset_ids).length ? { asset_ids } : {}),
   };
 }
 
@@ -323,7 +317,7 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
       : `Run batch (${drafts.length})`;
 
   return (
-    <div className="flex h-[calc(100vh-164px)] min-h-[640px] flex-col overflow-hidden">
+    <div className="flex h-[calc(100vh-164px)] min-h-160 flex-col overflow-hidden">
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -382,7 +376,9 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
                       selected={selectedMediaInputId === input.id}
                       onSelect={() => setSelectedMediaInputId(input.id)}
                       onPreview={() => setIsMediaPreviewOpen(true)}
-                      onFileSelect={(file) => handleMediaFileSelect(input, file)}
+                      onFileSelect={(file) =>
+                        handleMediaFileSelect(input, file)
+                      }
                       onInvalidFile={(file, errorMessage) =>
                         handleInvalidMediaFile(input, file, errorMessage)
                       }

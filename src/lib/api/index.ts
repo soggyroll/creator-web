@@ -39,7 +39,10 @@ export const api = {
 
   generations: {
     create: async (request: GenerateRequest): Promise<GenerateResponse> => {
-      const { data } = await apiClient.post("/generate", request);
+      const { data } = await apiClient.post<GenerateResponse>(
+        "/generate",
+        request,
+      );
       return data;
     },
     get: async (limit?: number): Promise<GenerationResult[]> => {
