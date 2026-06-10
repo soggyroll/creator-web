@@ -9,6 +9,7 @@ import { ChevronDownIcon, RefreshCwIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { useCreateGeneration } from "@/hooks/use-create-generation";
+import { api } from "@/lib/api";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -60,13 +61,10 @@ function createDraft(id: string, values = DEFAULT_FORM_VALUES): BatchDraft {
   };
 }
 
-function createPlaceholderAssetId(inputId: string) {
-  const id =
-    typeof crypto !== "undefined" && "randomUUID" in crypto
-      ? crypto.randomUUID()
-      : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-
-  return `placeholder-${inputId}-${id}`;
+function createUploadId() {
+  return typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
 function getFirstMediaInput(draft: BatchDraft) {
@@ -77,7 +75,7 @@ function buildWorkflowInputs(mediaInputs: Record<string, DraftMediaInput>) {
   const asset_ids: Record<string, string> = {};
 
   Object.values(mediaInputs).forEach((media) => {
-    if (!media.assetId || media.status === "failed") return;
+    if (!media.assetId || media.status !== "uploaded") return;
 
     asset_ids[media.inputId] = media.assetId;
   });
@@ -87,6 +85,38 @@ function buildWorkflowInputs(mediaInputs: Record<string, DraftMediaInput>) {
     image_urls: {},
     primitive_inputs: {},
   };
+}
+
+function uploadFileToSignedUrl(
+  uploadUrl: string,
+  file: File,
+  onProgress: (progress: number) => void,
+) {
+  return new Promise<void>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+
+    xhr.open("PUT", uploadUrl);
+    xhr.setRequestHeader("Content-Type", file.type);
+
+    xhr.upload.onprogress = (event) => {
+      if (!event.lengthComputable) return;
+      onProgress(Math.round((event.loaded / event.total) * 90));
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onProgress(95);
+        resolve();
+        return;
+      }
+
+      reject(new Error(`Upload failed with status ${xhr.status}.`));
+    };
+
+    xhr.onerror = () => reject(new Error("Upload failed. Please try again."));
+    xhr.onabort = () => reject(new Error("Upload was cancelled."));
+    xhr.send(file);
+  });
 }
 
 export default function GenerateForm({ workflowId }: GenerateFormProps) {
@@ -116,6 +146,11 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
   const readyDrafts = drafts.filter(
     (draft) => draft.values.prompt.trim().length > 0,
   );
+  const allMedia = drafts.flatMap((draft) => Object.values(draft.mediaInputs));
+  const hasUploadingMedia = allMedia.some(
+    (media) => media.status === "uploading",
+  );
+  const hasFailedMedia = allMedia.some((media) => media.status === "failed");
   const isBatchReady = readyDrafts.length === drafts.length;
 
   useEffect(() => {
@@ -142,20 +177,21 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
     );
   }
 
-  function updateActiveMediaInput(
-    input: WorkflowMediaInput,
+  function updateDraftMediaInput(
+    draftId: string,
+    inputId: string,
     media: DraftMediaInput | null,
   ) {
     setDrafts((current) =>
       current.map((draft) =>
-        draft.id === activeDraft.id
+        draft.id === draftId
           ? {
               ...draft,
               mediaInputs: media
-                ? { ...draft.mediaInputs, [input.id]: media }
+                ? { ...draft.mediaInputs, [inputId]: media }
                 : Object.fromEntries(
                     Object.entries(draft.mediaInputs).filter(
-                      ([inputId]) => inputId !== input.id,
+                      ([currentInputId]) => currentInputId !== inputId,
                     ),
                   ),
             }
@@ -164,20 +200,80 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
     );
   }
 
-  function handleMediaFileSelect(input: WorkflowMediaInput, file: File) {
+  function patchDraftMediaInput(
+    draftId: string,
+    inputId: string,
+    uploadId: string,
+    patch: Partial<DraftMediaInput>,
+  ) {
+    setDrafts((current) =>
+      current.map((draft) => {
+        if (draft.id !== draftId) return draft;
+
+        const currentMedia = draft.mediaInputs[inputId];
+        if (!currentMedia || currentMedia.uploadId !== uploadId) return draft;
+
+        return {
+          ...draft,
+          mediaInputs: {
+            ...draft.mediaInputs,
+            [inputId]: { ...currentMedia, ...patch },
+          },
+        };
+      }),
+    );
+  }
+
+  async function handleMediaFileSelect(input: WorkflowMediaInput, file: File) {
+    const draftId = activeDraft.id;
     const previous = activeDraft.mediaInputs[input.id];
     if (previous?.previewUrl) URL.revokeObjectURL(previous.previewUrl);
 
-    updateActiveMediaInput(input, {
+    const uploadId = createUploadId();
+    updateDraftMediaInput(draftId, input.id, {
+      uploadId,
       inputId: input.id,
       fileName: file.name,
       contentType: file.type,
       sizeBytes: file.size,
       previewUrl: URL.createObjectURL(file),
-      progress: 100,
-      status: "ready",
-      assetId: createPlaceholderAssetId(input.id),
+      progress: 0,
+      status: "uploading",
     });
+
+    try {
+      const upload = await api.assets.initUpload({
+        filename: file.name,
+        content_type: file.type,
+        size_bytes: file.size,
+      });
+
+      await uploadFileToSignedUrl(upload.upload_url, file, (progress) => {
+        patchDraftMediaInput(draftId, input.id, uploadId, { progress });
+      });
+
+      const completed = await api.assets.completeUpload({
+        asset_id: upload.asset_id,
+      });
+
+      patchDraftMediaInput(draftId, input.id, uploadId, {
+        assetId: completed.asset.id,
+        progress: 100,
+        status: "uploaded",
+      });
+
+      toast.success(`${file.name} uploaded.`);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Upload failed. Try again.";
+
+      patchDraftMediaInput(draftId, input.id, uploadId, {
+        progress: 0,
+        status: "failed",
+        error: message,
+      });
+      toast.error(message);
+    }
   }
 
   function handleInvalidMediaFile(
@@ -188,7 +284,7 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
     const previous = activeDraft.mediaInputs[input.id];
     if (previous?.previewUrl) URL.revokeObjectURL(previous.previewUrl);
 
-    updateActiveMediaInput(input, {
+    updateDraftMediaInput(activeDraft.id, input.id, {
       inputId: input.id,
       fileName: file.name,
       contentType: file.type || "unknown",
@@ -203,7 +299,7 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
   function clearMediaInput(input: WorkflowMediaInput) {
     const previous = activeDraft.mediaInputs[input.id];
     if (previous?.previewUrl) URL.revokeObjectURL(previous.previewUrl);
-    updateActiveMediaInput(input, null);
+    updateDraftMediaInput(activeDraft.id, input.id, null);
   }
 
   function addDraft() {
@@ -274,6 +370,16 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
       return;
     }
 
+    if (hasUploadingMedia) {
+      toast.error("Wait for media uploads to finish before running.");
+      return;
+    }
+
+    if (hasFailedMedia) {
+      toast.error("Clear or replace failed media before running.");
+      return;
+    }
+
     const generations = drafts.map((draft) => ({
       prompt: draft.values.prompt.trim(),
       workflow_id: workflowId,
@@ -299,22 +405,33 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
   }
 
   const values = activeDraft.values;
+
   const selectedMediaInput =
     WORKFLOW_MEDIA_INPUTS.find((input) => input.id === selectedMediaInputId) ??
     WORKFLOW_MEDIA_INPUTS[0];
+
   const selectedMedia = selectedMediaInput
     ? activeDraft.mediaInputs[selectedMediaInput.id]
     : undefined;
+
   const selectedPreset =
     IMAGE_SIZE_PRESETS.find(
       (preset) => preset.value === values.imageSizePreset,
     ) ?? IMAGE_SIZE_PRESETS[1];
-  const canSubmit = !isSignedIn || (!isPending && isBatchReady);
+
+  const canSubmit =
+    !isSignedIn ||
+    (!isPending && isBatchReady && !hasUploadingMedia && !hasFailedMedia);
+
   const runLabel = !isSignedIn
     ? "Sign in to run"
     : isPending
       ? "Running..."
-      : `Run batch (${drafts.length})`;
+      : hasUploadingMedia
+        ? "Uploading media..."
+        : hasFailedMedia
+          ? "Fix failed media"
+          : `Run batch (${drafts.length})`;
 
   return (
     <div className="flex h-[calc(100vh-164px)] min-h-160 flex-col overflow-hidden">

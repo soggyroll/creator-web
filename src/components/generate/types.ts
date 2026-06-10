@@ -23,12 +23,12 @@ export interface WorkflowMediaInput {
 
 export type MediaInputStatus =
   | "idle"
-  | "ready"
   | "uploading"
   | "uploaded"
   | "failed";
 
 export interface DraftMediaInput {
+  uploadId?: string;
   inputId: string;
   fileName: string;
   contentType: string;
