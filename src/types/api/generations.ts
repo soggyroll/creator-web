@@ -40,14 +40,19 @@ export type BatchPriority = "urgent" | "standard" | "patient";
 export type GenerationStatus = string;
 export interface WorkflowInputs {
   asset_ids?: Record<string, string>;
-  image_urls?: Record<string, string>;
-  primitive_inputs?: Record<string, unknown>;
+  image_urls: Record<string, string>;
+  primitive_inputs: Record<string, unknown>;
+}
+
+export interface WorkflowInputsBody {
+  asset_ids: Record<string, string>;
+  image_urls: Record<string, string>;
+  primitive_inputs: Record<string, unknown>;
 }
 
 export interface GenerationInput {
-  attachments?: Attachment[];
-  inputs?: WorkflowInputs;
-  prompt?: string;
+  inputs: WorkflowInputsBody;
+  prompt: string;
   workflow_id: string;
 }
 
@@ -57,7 +62,7 @@ export interface GenerateRequest {
 }
 
 export interface GenerateResponse {
-  batch_id?: string;
-  generation_ids?: string[];
-  status?: string;
+  batch_id: string;
+  generation_ids: string[];
+  status: string;
 }

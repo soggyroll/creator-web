@@ -1968,6 +1968,10 @@
     "definitions": {
         "github_com_comfy-creators_creator-backend_internal_api_dto.AssetListResponse": {
             "type": "object",
+            "required": [
+                "data",
+                "next_cursor"
+            ],
             "properties": {
                 "data": {
                     "type": "array",
@@ -1982,6 +1986,9 @@
         },
         "github_com_comfy-creators_creator-backend_internal_api_dto.AssetResponse": {
             "type": "object",
+            "required": [
+                "asset"
+            ],
             "properties": {
                 "asset": {
                     "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Asset"
@@ -1990,6 +1997,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_api_dto.AssetURLResponse": {
             "type": "object",
+            "required": [
+                "expires_at",
+                "url"
+            ],
             "properties": {
                 "expires_at": {
                     "type": "string"
@@ -2001,6 +2012,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_api_dto.BatchResponse": {
             "type": "object",
+            "required": [
+                "batch",
+                "generations"
+            ],
             "properties": {
                 "batch": {
                     "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Batch"
@@ -2027,8 +2042,16 @@
         "github_com_comfy-creators_creator-backend_internal_api_dto.CreateWorkflowRequest": {
             "type": "object",
             "required": [
+                "avg_time",
                 "comfy_workflow",
-                "name"
+                "cost",
+                "cover_url",
+                "default_timeout_seconds",
+                "description",
+                "is_public",
+                "model_files",
+                "name",
+                "required_vram_gb"
             ],
             "properties": {
                 "avg_time": {
@@ -2072,6 +2095,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_api_dto.CreditBalanceResponse": {
             "type": "object",
+            "required": [
+                "balance",
+                "team_id"
+            ],
             "properties": {
                 "balance": {
                     "type": "integer",
@@ -2085,6 +2112,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_api_dto.CursorPage-github_com_comfy-creators_creator-backend_internal_domain_Batch": {
             "type": "object",
+            "required": [
+                "data",
+                "next_cursor"
+            ],
             "properties": {
                 "data": {
                     "type": "array",
@@ -2099,6 +2130,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_api_dto.CursorPage-github_com_comfy-creators_creator-backend_internal_service_generation_GenerationResult": {
             "type": "object",
+            "required": [
+                "data",
+                "next_cursor"
+            ],
             "properties": {
                 "data": {
                     "type": "array",
@@ -2113,6 +2148,9 @@
         },
         "github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse": {
             "type": "object",
+            "required": [
+                "error"
+            ],
             "properties": {
                 "error": {
                     "type": "string"
@@ -2130,7 +2168,7 @@
                     "type": "array",
                     "minItems": 1,
                     "items": {
-                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_service_generation.GenerationInput"
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.GenerationInputBody"
                     }
                 },
                 "priority": {
@@ -2140,6 +2178,11 @@
         },
         "github_com_comfy-creators_creator-backend_internal_api_dto.GenerateResponse": {
             "type": "object",
+            "required": [
+                "batch_id",
+                "generation_ids",
+                "status"
+            ],
             "properties": {
                 "batch_id": {
                     "type": "string",
@@ -2157,8 +2200,31 @@
                 }
             }
         },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.GenerationInputBody": {
+            "type": "object",
+            "required": [
+                "inputs",
+                "prompt",
+                "workflow_id"
+            ],
+            "properties": {
+                "inputs": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.WorkflowInputsBody"
+                },
+                "prompt": {
+                    "type": "string"
+                },
+                "workflow_id": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_comfy-creators_creator-backend_internal_api_dto.GetActiveInstancesDbResponse": {
             "type": "object",
+            "required": [
+                "count",
+                "instances"
+            ],
             "properties": {
                 "count": {
                     "type": "integer",
@@ -2174,6 +2240,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_api_dto.GetActiveInstancesLiveResponse": {
             "type": "object",
+            "required": [
+                "count",
+                "instances"
+            ],
             "properties": {
                 "count": {
                     "type": "integer",
@@ -2189,6 +2259,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_api_dto.GetInventoryResponse": {
             "type": "object",
+            "required": [
+                "count",
+                "instances"
+            ],
             "properties": {
                 "count": {
                     "type": "integer",
@@ -2223,6 +2297,12 @@
         },
         "github_com_comfy-creators_creator-backend_internal_api_dto.InitAssetUploadResponse": {
             "type": "object",
+            "required": [
+                "asset_id",
+                "expires_at",
+                "s3_key",
+                "upload_url"
+            ],
             "properties": {
                 "asset_id": {
                     "type": "string"
@@ -2255,6 +2335,18 @@
         },
         "github_com_comfy-creators_creator-backend_internal_api_dto.UpdateWorkflowRequest": {
             "type": "object",
+            "required": [
+                "avg_time",
+                "comfy_workflow",
+                "cost",
+                "cover_url",
+                "default_timeout_seconds",
+                "description",
+                "is_public",
+                "model_files",
+                "name",
+                "required_vram_gb"
+            ],
             "properties": {
                 "avg_time": {
                     "type": "integer"
@@ -2291,8 +2383,37 @@
                 }
             }
         },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.WorkflowInputsBody": {
+            "type": "object",
+            "required": [
+                "asset_ids",
+                "image_urls",
+                "primitive_inputs"
+            ],
+            "properties": {
+                "asset_ids": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "image_urls": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "primitive_inputs": {
+                    "type": "object",
+                    "additionalProperties": {}
+                }
+            }
+        },
         "github_com_comfy-creators_creator-backend_internal_api_dto.WorkflowResponse": {
             "type": "object",
+            "required": [
+                "workflow"
+            ],
             "properties": {
                 "workflow": {
                     "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Workflow"
@@ -2301,6 +2422,9 @@
         },
         "github_com_comfy-creators_creator-backend_internal_api_dto.WorkflowViewResponse": {
             "type": "object",
+            "required": [
+                "workflow"
+            ],
             "properties": {
                 "workflow": {
                     "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.WorkflowView"
@@ -2309,6 +2433,19 @@
         },
         "github_com_comfy-creators_creator-backend_internal_client_mjolnir.Instance": {
             "type": "object",
+            "required": [
+                "created_at",
+                "details",
+                "id",
+                "internal_ip",
+                "location",
+                "name",
+                "network",
+                "provider",
+                "public_ip",
+                "status",
+                "type"
+            ],
             "properties": {
                 "created_at": {
                     "type": "string"
@@ -2354,6 +2491,11 @@
         },
         "github_com_comfy-creators_creator-backend_internal_client_mjolnir.InstanceDetails": {
             "type": "object",
+            "required": [
+                "node_count",
+                "original",
+                "ports"
+            ],
             "properties": {
                 "node_count": {
                     "type": "integer"
@@ -2389,9 +2531,27 @@
         },
         "github_com_comfy-creators_creator-backend_internal_client_mjolnir.InventoryItem": {
             "type": "object",
+            "required": [
+                "gpu",
+                "instance",
+                "location",
+                "original",
+                "price_per_hour",
+                "provider",
+                "ram",
+                "storage",
+                "type",
+                "vcpu"
+            ],
             "properties": {
                 "gpu": {
                     "type": "object",
+                    "required": [
+                        "available",
+                        "interface",
+                        "model",
+                        "vram"
+                    ],
                     "properties": {
                         "available": {
                             "type": "integer"
@@ -2409,6 +2569,10 @@
                 },
                 "instance": {
                     "type": "object",
+                    "required": [
+                        "gpu_count",
+                        "id"
+                    ],
                     "properties": {
                         "gpu_count": {
                             "type": "integer"
@@ -2427,6 +2591,10 @@
                 },
                 "price_per_hour": {
                     "type": "object",
+                    "required": [
+                        "currency",
+                        "fixed"
+                    ],
                     "properties": {
                         "currency": {
                             "type": "string"
@@ -2455,6 +2623,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_client_mjolnir.InventoryLocation": {
             "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
             "properties": {
                 "id": {
                     "type": "string"
@@ -2481,6 +2653,18 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.Asset": {
             "type": "object",
+            "required": [
+                "asset_type",
+                "content_type",
+                "created_at",
+                "id",
+                "name",
+                "s3_key",
+                "size_bytes",
+                "status",
+                "team_id",
+                "user_id"
+            ],
             "properties": {
                 "asset_type": {
                     "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.AssetType"
@@ -2553,6 +2737,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.Attachment": {
             "type": "object",
+            "required": [
+                "type",
+                "url"
+            ],
             "properties": {
                 "type": {
                     "type": "string"
@@ -2564,6 +2752,14 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.Batch": {
             "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "priority",
+                "status",
+                "team_id",
+                "user_id"
+            ],
             "properties": {
                 "completed_at": {
                     "type": "string"
@@ -2631,6 +2827,22 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.Generation": {
             "type": "object",
+            "required": [
+                "attachments",
+                "batch_id",
+                "enqueued_at",
+                "execution_stage",
+                "id",
+                "priority",
+                "prompt",
+                "retry_count",
+                "runtime_status",
+                "status",
+                "team_id",
+                "user_id",
+                "workflow_id",
+                "workflow_inputs"
+            ],
             "properties": {
                 "attachments": {
                     "description": "Ignored by DB, handled manually via JSONB byte mapping in Repo.",
@@ -2723,6 +2935,16 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.Instance": {
             "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "instance_type",
+                "load_score",
+                "provider",
+                "provider_instance_id",
+                "state",
+                "vram_gb"
+            ],
             "properties": {
                 "closed_at": {
                     "type": "string"
@@ -2802,6 +3024,14 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.LedgerEntry": {
             "type": "object",
+            "required": [
+                "created_at",
+                "delta",
+                "id",
+                "kind",
+                "team_id",
+                "user_id"
+            ],
             "properties": {
                 "created_at": {
                     "type": "string"
@@ -2851,6 +3081,12 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.Team": {
             "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "name",
+                "updated_at"
+            ],
             "properties": {
                 "archived_at": {
                     "type": "string"
@@ -2877,6 +3113,15 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.TeamMember": {
             "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "role",
+                "status",
+                "team_id",
+                "updated_at",
+                "user_id"
+            ],
             "properties": {
                 "created_at": {
                     "type": "string"
@@ -2915,6 +3160,14 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.TeamWithMembership": {
             "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "name",
+                "role",
+                "status",
+                "updated_at"
+            ],
             "properties": {
                 "archived_at": {
                     "type": "string"
@@ -2950,6 +3203,13 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.User": {
             "type": "object",
+            "required": [
+                "created_at",
+                "email",
+                "id",
+                "name",
+                "updated_at"
+            ],
             "properties": {
                 "avatar_url": {
                     "type": "string"
@@ -2973,6 +3233,21 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.Workflow": {
             "type": "object",
+            "required": [
+                "avg_time",
+                "comfy_workflow",
+                "cost",
+                "created_at",
+                "default_timeout_seconds",
+                "id",
+                "is_public",
+                "model_files",
+                "name",
+                "required_vram_gb",
+                "team_id",
+                "updated_at",
+                "user_id"
+            ],
             "properties": {
                 "avg_time": {
                     "type": "integer"
@@ -3026,6 +3301,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.WorkflowInputs": {
             "type": "object",
+            "required": [
+                "image_urls",
+                "primitive_inputs"
+            ],
             "properties": {
                 "asset_ids": {
                     "type": "object",
@@ -3047,6 +3326,13 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.WorkflowPage": {
             "type": "object",
+            "required": [
+                "data",
+                "has_more",
+                "limit",
+                "offset",
+                "total_count"
+            ],
             "properties": {
                 "data": {
                     "type": "array",
@@ -3070,6 +3356,11 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.WorkflowStats": {
             "type": "object",
+            "required": [
+                "likes",
+                "runs",
+                "saves"
+            ],
             "properties": {
                 "likes": {
                     "type": "integer"
@@ -3084,6 +3375,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.WorkflowTeamRef": {
             "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
             "properties": {
                 "id": {
                     "type": "string"
@@ -3095,6 +3390,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.WorkflowUserRef": {
             "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
             "properties": {
                 "id": {
                     "type": "string"
@@ -3106,6 +3405,18 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.WorkflowView": {
             "type": "object",
+            "required": [
+                "avg_time",
+                "cost",
+                "created_at",
+                "id",
+                "name",
+                "stats",
+                "team",
+                "updated_at",
+                "user",
+                "viewer"
+            ],
             "properties": {
                 "avg_time": {
                     "type": "integer"
@@ -3147,6 +3458,10 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.WorkflowViewer": {
             "type": "object",
+            "required": [
+                "liked",
+                "saved"
+            ],
             "properties": {
                 "liked": {
                     "type": "boolean"
@@ -3156,31 +3471,11 @@
                 }
             }
         },
-        "github_com_comfy-creators_creator-backend_internal_service_generation.GenerationInput": {
-            "type": "object",
-            "required": [
-                "workflow_id"
-            ],
-            "properties": {
-                "attachments": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Attachment"
-                    }
-                },
-                "inputs": {
-                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.WorkflowInputs"
-                },
-                "prompt": {
-                    "type": "string"
-                },
-                "workflow_id": {
-                    "type": "string"
-                }
-            }
-        },
         "github_com_comfy-creators_creator-backend_internal_service_generation.GenerationResult": {
             "type": "object",
+            "required": [
+                "generation"
+            ],
             "properties": {
                 "generation": {
                     "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Generation"

@@ -4,19 +4,19 @@ export type AssetStatus = "pending" | "uploaded" | "failed";
 export type AssetType = "input" | "output" | "lora" | "checkpoint";
 
 export interface Asset {
-  asset_type?: AssetType;
-  content_type?: string;
-  created_at?: string;
+  asset_type: AssetType;
+  content_type: string;
+  created_at: string;
   expires_at?: string;
   generation_id?: string;
-  id?: string;
-  name?: string;
-  s3_key?: string;
-  size_bytes?: number;
-  status?: AssetStatus;
-  team_id?: string;
+  id: string;
+  name: string;
+  s3_key: string;
+  size_bytes: number;
+  status: AssetStatus;
+  team_id: string;
   uploaded_at?: string;
-  user_id?: string;
+  user_id: string;
 }
 
 export interface ListAssetsParams {
@@ -25,8 +25,8 @@ export interface ListAssetsParams {
 }
 
 export interface AssetListResponse {
-  data?: Asset[];
-  next_cursor?: string;
+  data: Asset[];
+  next_cursor: string;
 }
 
 export interface InitAssetUploadRequest {
@@ -36,10 +36,10 @@ export interface InitAssetUploadRequest {
 }
 
 export interface InitAssetUploadResponse {
-  asset_id?: string;
-  expires_at?: string;
-  s3_key?: string;
-  upload_url?: string;
+  asset_id: string;
+  expires_at: string;
+  s3_key: string;
+  upload_url: string;
 }
 
 export interface CompleteAssetUploadRequest {
@@ -47,10 +47,10 @@ export interface CompleteAssetUploadRequest {
 }
 
 export interface AssetResponse {
-  asset?: Asset;
+  asset: Asset;
 }
 
 export interface AssetURLResponse {
-  expires_at?: string;
-  url?: string;
+  expires_at: string;
+  url: string;
 }

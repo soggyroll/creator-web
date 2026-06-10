@@ -83,9 +83,9 @@ function buildWorkflowInputs(mediaInputs: Record<string, DraftMediaInput>) {
   });
 
   return {
-    primitive_inputs: {},
+    asset_ids,
     image_urls: {},
-    ...(Object.keys(asset_ids).length ? { asset_ids } : {}),
+    primitive_inputs: {},
   };
 }
 
