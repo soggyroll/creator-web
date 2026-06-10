@@ -230,6 +230,7 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
     if (previous?.previewUrl) URL.revokeObjectURL(previous.previewUrl);
 
     const uploadId = createUploadId();
+
     updateDraftMediaInput(draftId, input.id, {
       uploadId,
       inputId: input.id,
