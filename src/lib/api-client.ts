@@ -1,12 +1,17 @@
 /** @format */
 
 import Axios, { AxiosRequestConfig, AxiosError } from "axios";
+import { getToken } from "@clerk/nextjs";
 
 const VERSION_PREFIX = "/api/v1";
 
 export const apiClient = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL + VERSION_PREFIX,
-  withCredentials: true,
+});
+
+apiClient.interceptors.request.use(async (config) => {
+  config.headers.Authorization = `Bearer ${await getToken()}`;
+  return config;
 });
 
 // Add a second `options` argument to pass extra options to each query
