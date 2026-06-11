@@ -2,6 +2,7 @@
 
 import Axios, { AxiosRequestConfig, AxiosError } from "axios";
 import { getToken } from "@clerk/nextjs";
+import { getTeamCookie } from "@/actions/team";
 
 const VERSION_PREFIX = "/api/v1";
 
@@ -11,6 +12,12 @@ export const apiClient = Axios.create({
 
 apiClient.interceptors.request.use(async (config) => {
   config.headers.Authorization = `Bearer ${await getToken()}`;
+  const teamId = await getTeamCookie();
+
+  if (teamId) {
+    config.headers["X-Team-ID"] = teamId;
+  }
+
   return config;
 });
 
