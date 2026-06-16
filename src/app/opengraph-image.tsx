@@ -86,7 +86,7 @@ export default function Image() {
         style={{
           marginTop: 44,
           fontSize: 28,
-          color: "yellow",
+          color: "magenta",
           letterSpacing: 1,
           display: "flex",
         }}
