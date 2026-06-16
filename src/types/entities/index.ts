@@ -1,5 +1,15 @@
 /** @format */
 
+export interface ReplaceableNode {
+  class_type: string;
+  current_value: unknown;
+  input_field: string;
+  input_kind: string;
+  node_id: string;
+  title: string;
+  value_type: string;
+}
+
 export interface Workflow {
   avg_time?: number;
   cost?: number;

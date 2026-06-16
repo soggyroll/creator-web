@@ -166,6 +166,111 @@
                 }
             }
         },
+        "/api/v1/admin/generations/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieves a generation by ID across all teams. Requires admin privileges.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Get Generation (Admin)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Generation ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_service_generation.GenerationResult"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/generations/{id}/events": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the ordered event log (coarse status transitions + fine generation-FSM steps) for the given generation ID. Admin only.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Get Generation Event Timeline (Admin)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Generation ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/admin/instances/db": {
             "get": {
                 "security": [
@@ -345,6 +450,65 @@
             }
         },
         "/api/v1/admin/instances/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a tracked VM row, including price fields and provider metadata when available. Admin only.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Get Instance (Admin)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Internal VM UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.InstanceDetail"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
             "delete": {
                 "security": [
                     {
@@ -376,6 +540,59 @@
                             "additionalProperties": {
                                 "type": "string"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/instances/{id}/events": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the ordered event log (coarse state transitions + fine deployment-FSM steps) for the given internal VM ID. Admin only.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Get Instance Event Timeline",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Internal VM UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
@@ -440,6 +657,111 @@
                             "additionalProperties": {
                                 "type": "string"
                             }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/observability/generation-step-durations": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns latency statistics per generation FSM step, based on start/end event brackets.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Generation Step Durations (Admin)",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.GenerationStepDurationSummary"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/observability/profitability": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Calculates total credits spent on generations, total USD spend on VMs, and the credits/dollar efficiency ratio. Admin only.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Profitability and Credit Efficiency Overview (Admin)",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.ProfitabilityOverview"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/observability/spend": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Estimates provider spend from instance price_per_hour and billable runtime. Active VMs are counted through the request time. Admin only.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Provider Spend Overview (Admin)",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.SpendOverview"
                         }
                     },
                     "500": {
@@ -2051,6 +2373,7 @@
                 "is_public",
                 "model_files",
                 "name",
+                "replaceable_nodes",
                 "required_vram_gb"
             ],
             "properties": {
@@ -2086,6 +2409,12 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "replaceable_nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.ReplaceableNode"
+                    }
                 },
                 "required_vram_gb": {
                     "type": "integer",
@@ -2209,7 +2538,7 @@
             ],
             "properties": {
                 "inputs": {
-                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.WorkflowInputsBody"
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.WorkflowInputs"
                 },
                 "prompt": {
                     "type": "string"
@@ -2345,6 +2674,7 @@
                 "is_public",
                 "model_files",
                 "name",
+                "replaceable_nodes",
                 "required_vram_gb"
             ],
             "properties": {
@@ -2378,34 +2708,14 @@
                 "name": {
                     "type": "string"
                 },
+                "replaceable_nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.ReplaceableNode"
+                    }
+                },
                 "required_vram_gb": {
                     "type": "integer"
-                }
-            }
-        },
-        "github_com_comfy-creators_creator-backend_internal_api_dto.WorkflowInputsBody": {
-            "type": "object",
-            "required": [
-                "asset_ids",
-                "image_urls",
-                "primitive_inputs"
-            ],
-            "properties": {
-                "asset_ids": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "image_urls": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "primitive_inputs": {
-                    "type": "object",
-                    "additionalProperties": {}
                 }
             }
         },
@@ -2814,6 +3124,33 @@
                 "BatchStatusFailed"
             ]
         },
+        "github_com_comfy-creators_creator-backend_internal_domain.CurrencySpendSummary": {
+            "type": "object",
+            "required": [
+                "active_instance_count",
+                "billable_seconds",
+                "currency",
+                "estimated_spend",
+                "instance_count"
+            ],
+            "properties": {
+                "active_instance_count": {
+                    "type": "integer"
+                },
+                "billable_seconds": {
+                    "type": "number"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "estimated_spend": {
+                    "type": "number"
+                },
+                "instance_count": {
+                    "type": "integer"
+                }
+            }
+        },
         "github_com_comfy-creators_creator-backend_internal_domain.FaultSource": {
             "type": "string",
             "enum": [
@@ -2933,10 +3270,58 @@
                 "GenerationStatusRetrying"
             ]
         },
+        "github_com_comfy-creators_creator-backend_internal_domain.GenerationStepDurationSummary": {
+            "type": "object",
+            "required": [
+                "avg_seconds",
+                "failed_count",
+                "finished_count",
+                "max_seconds",
+                "min_seconds",
+                "p50_seconds",
+                "p95_seconds",
+                "sample_count",
+                "started_count",
+                "step"
+            ],
+            "properties": {
+                "avg_seconds": {
+                    "type": "number"
+                },
+                "failed_count": {
+                    "type": "integer"
+                },
+                "finished_count": {
+                    "type": "integer"
+                },
+                "max_seconds": {
+                    "type": "number"
+                },
+                "min_seconds": {
+                    "type": "number"
+                },
+                "p50_seconds": {
+                    "type": "number"
+                },
+                "p95_seconds": {
+                    "type": "number"
+                },
+                "sample_count": {
+                    "type": "integer"
+                },
+                "started_count": {
+                    "type": "integer"
+                },
+                "step": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_comfy-creators_creator-backend_internal_domain.Instance": {
             "type": "object",
             "required": [
                 "created_at",
+                "currency",
                 "id",
                 "instance_type",
                 "load_score",
@@ -2950,6 +3335,9 @@
                     "type": "string"
                 },
                 "created_at": {
+                    "type": "string"
+                },
+                "currency": {
                     "type": "string"
                 },
                 "id": {
@@ -2967,11 +3355,16 @@
                 "load_score": {
                     "type": "integer"
                 },
+                "price_per_hour": {
+                    "type": "number"
+                },
                 "provider": {
-                    "description": "e.g., \"vastai\", \"akash\", \"datacrunch\"",
-                    "type": "string"
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_client_mjolnir.ProviderType"
                 },
                 "provider_instance_id": {
+                    "type": "string"
+                },
+                "provisioned_at": {
                     "type": "string"
                 },
                 "state": {
@@ -2979,6 +3372,66 @@
                 },
                 "vram_gb": {
                     "type": "integer"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.InstanceDetail": {
+            "type": "object",
+            "required": [
+                "instance"
+            ],
+            "properties": {
+                "instance": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Instance"
+                },
+                "provider_metadata": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.InstanceProviderMetadata"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.InstanceProviderMetadata": {
+            "type": "object",
+            "required": [
+                "instance_id",
+                "raw_provider_data",
+                "updated_at"
+            ],
+            "properties": {
+                "gpu_model": {
+                    "type": "string"
+                },
+                "instance_id": {
+                    "type": "string"
+                },
+                "internal_ip": {
+                    "type": "string"
+                },
+                "ogre_url": {
+                    "type": "string"
+                },
+                "preset_id": {
+                    "type": "string"
+                },
+                "public_ip": {
+                    "type": "string"
+                },
+                "raw_provider_data": {
+                    "type": "object"
+                },
+                "region": {
+                    "type": "string"
+                },
+                "ssh_port": {
+                    "type": "integer"
+                },
+                "ssh_username": {
+                    "type": "string"
+                },
+                "tasuke_url": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },
@@ -3078,6 +3531,118 @@
                 "LedgerKindGrant",
                 "LedgerKindAdjustment"
             ]
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.ProfitabilityOverview": {
+            "type": "object",
+            "required": [
+                "credits_per_usd",
+                "generated_at",
+                "total_credits_spent",
+                "total_spend_usd"
+            ],
+            "properties": {
+                "credits_per_usd": {
+                    "type": "number"
+                },
+                "generated_at": {
+                    "type": "string"
+                },
+                "total_credits_spent": {
+                    "type": "integer"
+                },
+                "total_spend_usd": {
+                    "type": "number"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.ProviderSpendSummary": {
+            "type": "object",
+            "required": [
+                "active_instance_count",
+                "billable_seconds",
+                "currency",
+                "estimated_spend",
+                "instance_count",
+                "provider"
+            ],
+            "properties": {
+                "active_instance_count": {
+                    "type": "integer"
+                },
+                "billable_seconds": {
+                    "type": "number"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "estimated_spend": {
+                    "type": "number"
+                },
+                "instance_count": {
+                    "type": "integer"
+                },
+                "provider": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.ReplaceableNode": {
+            "type": "object",
+            "required": [
+                "class_type",
+                "current_value",
+                "input_field",
+                "input_kind",
+                "node_id",
+                "title",
+                "value_type"
+            ],
+            "properties": {
+                "class_type": {
+                    "type": "string"
+                },
+                "current_value": {},
+                "input_field": {
+                    "type": "string"
+                },
+                "input_kind": {
+                    "type": "string"
+                },
+                "node_id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "value_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.SpendOverview": {
+            "type": "object",
+            "required": [
+                "by_currency",
+                "by_provider",
+                "generated_at"
+            ],
+            "properties": {
+                "by_currency": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.CurrencySpendSummary"
+                    }
+                },
+                "by_provider": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.ProviderSpendSummary"
+                    }
+                },
+                "generated_at": {
+                    "type": "string"
+                }
+            }
         },
         "github_com_comfy-creators_creator-backend_internal_domain.Team": {
             "type": "object",
@@ -3243,6 +3808,7 @@
                 "is_public",
                 "model_files",
                 "name",
+                "replaceable_nodes",
                 "required_vram_gb",
                 "team_id",
                 "updated_at",
@@ -3285,6 +3851,12 @@
                 "name": {
                     "type": "string"
                 },
+                "replaceable_nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.ReplaceableNode"
+                    }
+                },
                 "required_vram_gb": {
                     "type": "integer"
                 },
@@ -3301,28 +3873,7 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.WorkflowInputs": {
             "type": "object",
-            "required": [
-                "image_urls",
-                "primitive_inputs"
-            ],
-            "properties": {
-                "asset_ids": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "image_urls": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "primitive_inputs": {
-                    "type": "object",
-                    "additionalProperties": {}
-                }
-            }
+            "additionalProperties": {}
         },
         "github_com_comfy-creators_creator-backend_internal_domain.WorkflowPage": {
             "type": "object",

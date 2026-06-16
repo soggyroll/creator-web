@@ -23,6 +23,7 @@ import {
 import { Team, TeamWithMembership, TeamMember } from "@/types/api/teams";
 import { apiClient } from "../api-client";
 import { Workflow } from "@/types/entities";
+import { CreateWorkflowRequest } from "@/types/api/workflows";
 
 export const api = {
   credits: {
@@ -107,6 +108,15 @@ export const api = {
     getById: async (id: string): Promise<WorkflowResponse> => {
       const { data } = await apiClient.get<WorkflowResponse>(
         `/workflows/${id}`,
+      );
+      return data;
+    },
+    create: async (
+      request: CreateWorkflowRequest,
+    ): Promise<WorkflowResponse> => {
+      const { data } = await apiClient.post<WorkflowResponse>(
+        "/workflows",
+        request,
       );
       return data;
     },
