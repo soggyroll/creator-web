@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://soggyroll.art"),
 
   title: {
-    default: "Soggy Roll",
+    default: "Soggy Roll - Generate without Pain of infrastructure",
     template: "%s | Soggy Roll",
   },
   description: DESCRIPTION,
