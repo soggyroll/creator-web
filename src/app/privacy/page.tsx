@@ -43,7 +43,7 @@ const SECTIONS = [
     body: [
       "Clerk — authentication and account management.",
       "Polar — payment processing. Polar handles all billing data under their own privacy policy.",
-      "GPU compute providers — your workflow and input files are transmitted to third-party GPU infrastructure to execute your generation. All providers we use are GDPR-compliant.",
+      "GPU compute providers — your workflow and input files are transmitted to third-party GPU infrastructure to execute your generation. All providers we use are GDPR-compliant. All the data is deleted from their system as soon as generation completes.",
       "Vercel — hosting and anonymous usage analytics.",
       "We do not share personally identifiable information with any other parties.",
     ],
@@ -173,9 +173,12 @@ export default function PrivacyPage() {
         </div>
 
         <div className="mt-14 rounded-xl border border-border bg-muted/30 px-6 py-6">
-          <p className="text-sm font-semibold text-foreground">Questions or requests?</p>
+          <p className="text-sm font-semibold text-foreground">
+            Questions or requests?
+          </p>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            We actively respond to every message. Reach us at any of the addresses below — we&apos;ll get back to you within 12 hours.
+            We actively respond to every message. Reach us at any of the
+            addresses below — we&apos;ll get back to you within 12 hours.
           </p>
           <div className="mt-4 flex flex-col gap-1.5 text-sm">
             <a
