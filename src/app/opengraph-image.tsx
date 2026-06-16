@@ -9,7 +9,6 @@ export const contentType = "image/png";
 export const alt = "Soggy Roll — ComfyUI workflows on demand";
 
 const BG = "#0d0c17";
-const MUTED = "#4e4e68";
 const DIM = "#242434";
 
 export default function Image() {
@@ -86,8 +85,8 @@ export default function Image() {
       <div
         style={{
           marginTop: 44,
-          fontSize: 22,
-          color: MUTED,
+          fontSize: 28,
+          color: "yellow",
           letterSpacing: 1,
           display: "flex",
         }}
