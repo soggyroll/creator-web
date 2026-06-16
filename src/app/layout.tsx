@@ -22,7 +22,7 @@ const bebasNeue = Bebas_Neue({
 export const metadata: Metadata = {
   title: "Soggy Roll",
   description:
-    "ComfyUI workflows on demand. Buy credits, run jobs, download results. No GPU required.",
+    "ComfyUI workflows on demand. Buy credits, run generations, download results. No GPU required.",
 };
 
 export default function RootLayout({

@@ -16,7 +16,7 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 const HOW_STEPS = [
   {
     num: "01",
-    title: "Submit your job",
+    title: "Submit your generation",
     desc: "Upload your ComfyUI workflow and any files it needs. That's the hard part — and it's not hard.",
   },
   {
@@ -232,7 +232,7 @@ export default function LandingPage() {
 
           <p className="gs-hero relative z-10 mx-auto mt-8 max-w-lg text-balance text-base leading-relaxed text-muted-foreground">
             Pick ComfyUI workflow. No GPU. No config. No subscription. Buy
-            credits, run jobs, download results.
+            credits, run generations, download results.
           </p>
 
           <div className="gs-hero relative z-10 mt-10 flex flex-wrap items-center justify-center gap-3">
@@ -338,7 +338,7 @@ export default function LandingPage() {
               </h2>
             </div>
             <p className="gs-fade mb-14 text-center text-sm text-muted-foreground">
-              Soggy Roll runs your job, charges you for exactly that job, and
+              Soggy Roll runs your generation, charges you for exactly that, and
               gets out of the way.
             </p>
             <div className="grid gap-5 sm:grid-cols-3">
@@ -421,12 +421,11 @@ export default function LandingPage() {
       {/* FOOTER */}
       <footer className="border-t border-border/40 bg-background py-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-6 text-center sm:flex-row sm:justify-between sm:text-left">
-          <div className="flex items-center gap-2.5">
-            <Image src="/icon.png" alt="Soggy Roll" width={20} height={20} />
+          <Image src="/soggyroll.png" alt="Soggy Roll" width={80} height={22} className="h-4 w-auto" />
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>
           </div>
-          <p className="text-xs text-muted-foreground">
-            ComfyUI workflows on demand.
-          </p>
         </div>
       </footer>
     </div>
