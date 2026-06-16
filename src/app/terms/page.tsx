@@ -25,6 +25,8 @@ const SECTIONS = [
     body: [
       "Credits are purchased upfront and spent when you submit generations.",
       "Credits are non-refundable once purchased — with one exception: if a generation fails due to an error on our side, the credits spent on that generation are returned to your account.",
+      "No refund is issued for output quality. Soggy Roll executes your workflow as submitted — the result depends on your workflow, your inputs, and the models you use. Dissatisfaction with the output does not qualify for a credit refund.",
+      "If you are unhappy with any aspect of the service, we actively want to hear about it. Contact us at support@soggyroll.art or through our support portal at support.soggyroll.art — we respond within 12 hours. While we cannot guarantee a refund for quality, we will always work with you to understand what went wrong.",
       "We do not guarantee generation execution time. Time varies depending on infrastructure availability, the complexity of your workflow, and your inputs.",
       "Credit pricing may change. We will email you at least 7 days before any pricing change takes effect.",
     ],
@@ -196,16 +198,33 @@ export default function TermsPage() {
           ))}
         </div>
 
-        <div className="mt-14 border-t border-border pt-10">
-          <p className="text-sm text-muted-foreground">
-            Questions about these terms?{" "}
+        <div className="mt-14 rounded-xl border border-border bg-muted/30 px-6 py-6">
+          <p className="text-sm font-semibold text-foreground">We&apos;re here if you need us</p>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Got a question, a problem, or just something on your mind? Reach out — we respond within 12 hours.
+          </p>
+          <div className="mt-4 flex flex-col gap-1.5 text-sm">
             <a
-              href="mailto:legal@soggyroll.com"
+              href="mailto:support@soggyroll.art"
               className="text-foreground underline-offset-4 hover:underline"
             >
-              legal@soggyroll.com
+              support@soggyroll.art
             </a>
-          </p>
+            <a
+              href="mailto:hi@soggyroll.art"
+              className="text-muted-foreground underline-offset-4 hover:underline hover:text-foreground transition-colors"
+            >
+              hi@soggyroll.art
+            </a>
+            <a
+              href="https://support.soggyroll.art"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground underline-offset-4 hover:underline hover:text-foreground transition-colors"
+            >
+              support.soggyroll.art ↗
+            </a>
+          </div>
         </div>
       </main>
 

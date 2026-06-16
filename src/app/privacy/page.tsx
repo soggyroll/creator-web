@@ -80,7 +80,8 @@ const SECTIONS = [
     num: "08",
     title: "Contact",
     body: [
-      "For any privacy-related questions or requests, contact us at privacy@soggyroll.com.",
+      "For privacy-related questions or data requests, contact us at support@soggyroll.art or through our support portal at support.soggyroll.art.",
+      "For anything else, reach us at hi@soggyroll.art. We respond within 12 hours.",
     ],
   },
 ];
@@ -163,6 +164,35 @@ export default function PrivacyPage() {
               </ul>
             </div>
           ))}
+        </div>
+
+        <div className="mt-14 rounded-xl border border-border bg-muted/30 px-6 py-6">
+          <p className="text-sm font-semibold text-foreground">Questions or requests?</p>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            We actively respond to every message. Reach us at any of the addresses below — we&apos;ll get back to you within 12 hours.
+          </p>
+          <div className="mt-4 flex flex-col gap-1.5 text-sm">
+            <a
+              href="mailto:support@soggyroll.art"
+              className="text-foreground underline-offset-4 hover:underline"
+            >
+              support@soggyroll.art
+            </a>
+            <a
+              href="mailto:hi@soggyroll.art"
+              className="text-muted-foreground underline-offset-4 hover:underline hover:text-foreground transition-colors"
+            >
+              hi@soggyroll.art
+            </a>
+            <a
+              href="https://support.soggyroll.art"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground underline-offset-4 hover:underline hover:text-foreground transition-colors"
+            >
+              support.soggyroll.art ↗
+            </a>
+          </div>
         </div>
       </main>
 
