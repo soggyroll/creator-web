@@ -204,8 +204,8 @@ export default function LandingPage() {
         <section className="relative flex min-h-[92vh] flex-col items-center justify-center overflow-hidden px-6 py-28 text-center">
           {/* Background glows */}
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute left-1/2 top-1/3 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/[0.07] blur-[140px]" />
-            <div className="absolute bottom-1/4 right-1/4 h-64 w-64 rounded-full bg-primary/[0.06] blur-[100px]" />
+            <div className="absolute left-1/2 top-1/3 h-130 w-130 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/[0.07] blur-[140px]" />
+            <div className="absolute bottom-1/4 right-1/4 h-64 w-64 rounded-full bg-primary/6 blur-[100px]" />
           </div>
           {/* Dot grid */}
           <div
@@ -399,7 +399,7 @@ export default function LandingPage() {
                     className="inline h-24 w-auto"
                   />
                 </h2>
-                <p className="max-w-md text-sm text-primary-foreground/70">
+                <p className="max-w-md text-primary-foreground/70">
                   Create an account, buy some credits, and submit your first
                   workflow in under two minutes.
                 </p>
