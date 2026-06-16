@@ -297,15 +297,15 @@ function WorkflowCard({ workflow }: { workflow: Workflow }) {
         height={540}
       />
 
-      {/* Gradient — solid black base covering the info panel, fades up */}
-      <div className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-transparent" />
+      {/* Gradient — solid dark base covering the info panel, fades up */}
+      <div className="absolute inset-0 bg-linear-to-t from-background via-background/60 to-transparent" />
 
       {/* Hover tint */}
-      <div className="absolute inset-0 bg-white/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="absolute inset-0 bg-foreground/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
       {/* Runs count — top right, social proof */}
       <div className="absolute right-2.5 top-2.5">
-        <span className="flex items-center gap-1 rounded-full border border-white/15 bg-black/60 px-2 py-0.5 text-xs font-semibold text-white/80 backdrop-blur-sm">
+        <span className="flex items-center gap-1 rounded-full border border-foreground/15 bg-background/60 px-2 py-0.5 text-xs font-semibold text-foreground/80 backdrop-blur-sm">
           <ZapIcon className="size-3" />
           {fmtCount(workflow.stats?.runs)}
         </span>
@@ -313,7 +313,7 @@ function WorkflowCard({ workflow }: { workflow: Workflow }) {
 
       {/* "Use this →" CTA — fades in at center on hover */}
       <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-        <span className="flex items-center gap-1.5 rounded-full border border-white/30 bg-white/20 px-4 py-2 text-xs font-semibold text-white backdrop-blur-md">
+        <span className="flex items-center gap-1.5 rounded-full border border-primary/50 bg-primary/20 px-4 py-2 text-xs font-semibold text-primary backdrop-blur-md">
           Use this
           <ArrowRightIcon className="size-3.5" />
         </span>
@@ -321,13 +321,13 @@ function WorkflowCard({ workflow }: { workflow: Workflow }) {
 
       {/* Bottom info — always visible */}
       <div className="absolute inset-x-0 bottom-0 p-3">
-        <p className="text-base font-semibold text-start leading-tight text-white line-clamp-1">
+        <p className="text-base font-semibold text-start leading-tight text-foreground line-clamp-1">
           {workflow.name}
         </p>
-        <p className="mt-1 text-sm text-start leading-snug text-white/65 line-clamp-1">
+        <p className="mt-1 text-sm text-start leading-snug text-foreground/65 line-clamp-1">
           {workflow.description}
         </p>
-        <div className="mt-2 flex items-center gap-3 text-sm text-white/55">
+        <div className="mt-2 flex items-center gap-3 text-sm text-foreground/55">
           <span className="flex items-center gap-1">
             <HeartIcon className="size-3" />
             {fmtCount(workflow.stats?.likes)}

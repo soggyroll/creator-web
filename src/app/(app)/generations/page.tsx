@@ -50,7 +50,7 @@ export default function GenerationsPage() {
             </p>
           </div>
           <Button variant="outline" size="sm" asChild>
-            <Link href="/generate">Create your first one</Link>
+            <Link href="/discover">Find a workflow to use</Link>
           </Button>
         </div>
       ) : (
