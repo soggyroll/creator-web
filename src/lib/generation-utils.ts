@@ -29,11 +29,11 @@ export function statusVariant(
 export function statusColorClass(status: string | undefined): string {
   switch (status) {
     case "completed":
-      return "border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400";
+      return "border-primary/30 bg-primary/10 text-primary";
     case "running":
       return "border-primary/30 bg-primary/10 text-primary";
     case "retrying":
-      return "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400";
+      return "border-accent/30 bg-accent/10 text-accent";
     default:
       return "";
   }

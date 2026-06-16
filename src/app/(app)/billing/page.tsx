@@ -94,7 +94,7 @@ export default function BillingPage() {
                   className={[
                     "flex size-8 shrink-0 items-center justify-center rounded-full",
                     tx.kind !== "charge"
-                      ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                      ? "bg-primary/10 text-primary"
                       : "bg-muted text-muted-foreground",
                   ].join(" ")}
                 >
@@ -117,7 +117,7 @@ export default function BillingPage() {
                   variant="secondary"
                   className={
                     tx.kind !== "charge"
-                      ? "border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400"
+                      ? "border-primary/30 bg-primary/10 text-primary"
                       : ""
                   }
                 >
@@ -129,7 +129,7 @@ export default function BillingPage() {
                   className={[
                     "shrink-0 text-sm font-medium tabular-nums",
                     tx.kind === "charge"
-                      ? "text-green-700 dark:text-green-400"
+                      ? "text-primary"
                       : "text-muted-foreground",
                   ].join(" ")}
                 >

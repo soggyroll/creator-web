@@ -2,9 +2,10 @@
 
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CreditCardIcon, FlameIcon } from "lucide-react";
+import { CreditCardIcon } from "lucide-react";
 import { useAuth, UserButton } from "@clerk/nextjs";
 
 import { useCreditBalance } from "@/hooks/use-credit-balance";
@@ -61,13 +62,14 @@ export function AppNav() {
     <header className="sticky w-full top-0 z-50 border-b border-border/40 bg-background/90 backdrop-blur-md">
       <div className="mx-[10%] flex h-14 items-center gap-6 px-6 justify-between">
         {/* Logo */}
-        <Link href="/discover" className="flex shrink-0 items-center gap-2">
-          <div className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <FlameIcon className="size-4" />
-          </div>
-          <span className="text-sm font-semibold tracking-tight">
-            Soggy Roll
-          </span>
+        <Link href="/discover" className="flex shrink-0 items-center gap-2.5">
+          <Image
+            src="/soggyroll.png"
+            alt="Soggy Roll"
+            width={120}
+            height={33}
+            className="h-8 w-auto"
+          />
         </Link>
 
         {/* Nav links */}

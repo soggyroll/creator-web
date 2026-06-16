@@ -113,7 +113,7 @@ export default function WorkflowPage({
             <div className="absolute left-8 top-6 md:left-14 md:top-8">
               <button
                 onClick={() => router.back()}
-                className="flex items-center gap-1.5 rounded-md border border-white/20 bg-black/30 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm transition-colors hover:bg-black/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex items-center gap-1.5 rounded-md border border-foreground/20 bg-background/40 px-3 py-1.5 text-xs font-medium text-foreground backdrop-blur-sm transition-colors hover:bg-background/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 aria-label="Go back"
               >
                 <ArrowLeftIcon className="size-3.5" />
