@@ -94,6 +94,7 @@ export function AppNav() {
         <div className="flex items-center gap-3">
           {isLoaded && isSignedIn ? (
             <>
+              <TeamSelect />
               {/* <TeamSelect /> */}
               <div className="flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 px-3 py-1">
                 <CreditCardIcon className="size-3 text-muted-foreground" />
