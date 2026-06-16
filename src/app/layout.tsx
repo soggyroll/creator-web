@@ -19,10 +19,63 @@ const bebasNeue = Bebas_Neue({
   display: "swap",
 });
 
+const DESCRIPTION =
+  "ComfyUI workflows on demand. Buy credits, run generations, download results. No GPU, no config, no subscription.";
+
 export const metadata: Metadata = {
-  title: "Soggy Roll",
-  description:
-    "ComfyUI workflows on demand. Buy credits, run generations, download results. No GPU required.",
+  metadataBase: new URL("https://soggyroll.art"),
+
+  title: {
+    default: "Soggy Roll",
+    template: "%s — Soggy Roll",
+  },
+  description: DESCRIPTION,
+  applicationName: "Soggy Roll",
+  keywords: [
+    "ComfyUI",
+    "GPU compute",
+    "AI image generation",
+    "stable diffusion",
+    "workflow runner",
+    "on-demand GPU",
+    "no subscription GPU",
+    "ComfyUI cloud",
+    "generative AI",
+    "image generation API",
+  ],
+
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://soggyroll.art",
+    siteName: "Soggy Roll",
+    title: "Soggy Roll",
+    description: DESCRIPTION,
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Soggy Roll",
+    description: DESCRIPTION,
+    site: "@soggyroll",
+  },
+
+  icons: {
+    icon: [{ url: "/icon.png", type: "image/png" }],
+    apple: [{ url: "/icon.png" }],
+    shortcut: "/favicon.png",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({

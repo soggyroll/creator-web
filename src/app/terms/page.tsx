@@ -6,8 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — Soggy Roll",
-  description: "The rules for using Soggy Roll.",
+  title: "Terms of Service",
+  description: "The rules for using Soggy Roll — credits, generations, prohibited content, and your rights.",
+  alternates: { canonical: "/terms" },
+  openGraph: {
+    title: "Terms of Service — Soggy Roll",
+    description: "The rules for using Soggy Roll — credits, generations, prohibited content, and your rights.",
+    url: "/terms",
+  },
 };
 
 const SECTIONS = [
