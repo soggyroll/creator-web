@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 
   title: {
     default: "Soggy Roll",
-    template: "%s — Soggy Roll",
+    template: "%s | Soggy Roll",
   },
   description: DESCRIPTION,
   applicationName: "Soggy Roll",

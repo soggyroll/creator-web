@@ -38,11 +38,15 @@ function getStepIndex(status: string | undefined) {
   return 0;
 }
 
+interface GenerationDetailPageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
+
 export default function GenerationDetailPage({
   params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+}: GenerationDetailPageProps) {
   const { id } = use(params);
   const { data: result, isLoading } = useGeneration(id);
 
