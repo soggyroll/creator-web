@@ -65,7 +65,9 @@ export function AppNav() {
           <div className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <FlameIcon className="size-4" />
           </div>
-          <span className="text-sm font-semibold tracking-tight">Forge</span>
+          <span className="text-sm font-semibold tracking-tight">
+            Soggy Roll
+          </span>
         </Link>
 
         {/* Nav links */}
