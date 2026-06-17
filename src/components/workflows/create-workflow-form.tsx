@@ -24,6 +24,7 @@ import {
   FieldError,
   FieldLabel,
 } from "@/components/ui/field";
+import type { AxiosError } from "axios";
 import { useCreateWorkflow } from "@/hooks/use-create-workflow";
 import { api } from "@/lib/api";
 import { uploadFileToS3 } from "@/lib/upload";
@@ -315,8 +316,15 @@ export function CreateWorkflowForm() {
           const id = data.workflow?.id;
           router.push(id ? `/workflows/${id}` : "/discover");
         },
-        onError: () => {
-          toast.error("Failed to create workflow");
+        onError: (error) => {
+          const status = (error as AxiosError)?.response?.status;
+          if (status === 403) {
+            toast.error(
+              "Workflow creation is not enabled for your team. Contact an owner to request access.",
+            );
+          } else {
+            toast.error("Failed to create workflow");
+          }
         },
       },
     );

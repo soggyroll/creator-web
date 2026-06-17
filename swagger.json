@@ -2094,7 +2094,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns all members of the given team. The caller must be an active member.",
+                "description": "Returns all members of the given team with name and avatar. The caller must be an active member.",
                 "produces": [
                     "application/json"
                 ],
@@ -2117,26 +2117,20 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.TeamMember"
+                                "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.TeamMemberView"
                             }
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
                         }
                     }
                 }
@@ -4160,6 +4154,51 @@
                     "type": "string"
                 },
                 "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.TeamMemberView": {
+            "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "role",
+                "status",
+                "team_id",
+                "user_email",
+                "user_id",
+                "user_name"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "joined_at": {
+                    "type": "string"
+                },
+                "role": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.RoleOwner"
+                },
+                "status": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.MemberStatus"
+                },
+                "team_id": {
+                    "type": "string"
+                },
+                "user_avatar_url": {
+                    "type": "string"
+                },
+                "user_email": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "user_name": {
                     "type": "string"
                 }
             }

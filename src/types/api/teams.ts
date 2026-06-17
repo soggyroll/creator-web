@@ -45,6 +45,19 @@ export interface TeamMember {
   user_id?: string;
 }
 
+export interface TeamMemberView {
+  created_at: string;
+  id: string;
+  joined_at?: string;
+  role: TeamRole;
+  status: MemberStatus;
+  team_id: string;
+  user_avatar_url?: string;
+  user_email: string;
+  user_id: string;
+  user_name: string;
+}
+
 export interface UpdateTeamRequest {
   name?: string;
   slug?: string;
@@ -56,6 +69,11 @@ export interface UpdateMemberRoleRequest {
 
 export interface GrantFeatureRequest {
   feature: TeamFeature;
+}
+
+export interface AddMemberRequest {
+  user_id: string;
+  role: TeamRole;
 }
 
 export type TeamFeaturesResponse = Record<string, TeamFeature[]>;

@@ -24,8 +24,10 @@ import {
   Team,
   TeamWithMembership,
   TeamMember,
+  TeamMemberView,
   UpdateTeamRequest,
   UpdateMemberRoleRequest,
+  AddMemberRequest,
   GrantFeatureRequest,
   TeamFeaturesResponse,
 } from "@/types/api/teams";
@@ -86,7 +88,7 @@ export const api = {
     leave: async (id: string): Promise<void> => {
       await apiClient.post(`/teams/${id}/leave`);
     },
-    getMembers: async (id: string): Promise<TeamMember[]> => {
+    getMembers: async (id: string): Promise<TeamMemberView[]> => {
       const { data } = await apiClient.get(`/teams/${id}/members`);
       return data;
     },
@@ -100,6 +102,19 @@ export const api = {
         request,
       );
       return data;
+    },
+    addMember: async (
+      teamId: string,
+      request: AddMemberRequest,
+    ): Promise<TeamMember> => {
+      const { data } = await apiClient.post(
+        `/teams/${teamId}/members`,
+        request,
+      );
+      return data;
+    },
+    removeMember: async (teamId: string, userId: string): Promise<void> => {
+      await apiClient.delete(`/teams/${teamId}/members/${userId}`);
     },
   },
 
