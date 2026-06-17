@@ -1605,7 +1605,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.CursorPage-github_com_comfy-creators_creator-backend_internal_service_generation_GenerationResult"
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.CursorPage-github_com_comfy-creators_creator-backend_internal_domain_GenerationView"
                         }
                     },
                     "500": {
@@ -1648,7 +1648,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_service_generation.GenerationResult"
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.GenerationView"
                         }
                     },
                     "403": {
@@ -2839,6 +2839,24 @@
                 }
             }
         },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.CursorPage-github_com_comfy-creators_creator-backend_internal_domain_GenerationView": {
+            "type": "object",
+            "required": [
+                "data",
+                "next_cursor"
+            ],
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.GenerationView"
+                    }
+                },
+                "next_cursor": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_comfy-creators_creator-backend_internal_api_dto.CursorPage-github_com_comfy-creators_creator-backend_internal_service_generation_GenerationResult": {
             "type": "object",
             "required": [
@@ -3704,6 +3722,133 @@
                     "type": "integer"
                 },
                 "step": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.GenerationUserRef": {
+            "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.GenerationView": {
+            "type": "object",
+            "required": [
+                "attachments",
+                "batch_id",
+                "enqueued_at",
+                "execution_stage",
+                "id",
+                "priority",
+                "prompt",
+                "retry_count",
+                "status",
+                "team_id",
+                "user",
+                "workflow",
+                "workflow_inputs"
+            ],
+            "properties": {
+                "attachments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Attachment"
+                    }
+                },
+                "batch_id": {
+                    "type": "string"
+                },
+                "enqueued_at": {
+                    "type": "string"
+                },
+                "error_log": {
+                    "type": "string"
+                },
+                "execution_stage": {
+                    "type": "string"
+                },
+                "fault_source": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.FaultSource"
+                },
+                "finished_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "output_expiry": {
+                    "type": "string"
+                },
+                "output_url": {
+                    "type": "string"
+                },
+                "priority": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.BatchPriority"
+                },
+                "prompt": {
+                    "type": "string"
+                },
+                "retry_count": {
+                    "type": "integer"
+                },
+                "started_at": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.GenerationStatus"
+                },
+                "team_id": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.GenerationUserRef"
+                },
+                "workflow": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.GenerationWorkflowRef"
+                },
+                "workflow_inputs": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.WorkflowInputs"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.GenerationWorkflowRef": {
+            "type": "object",
+            "required": [
+                "avg_time",
+                "cost",
+                "id",
+                "name"
+            ],
+            "properties": {
+                "avg_time": {
+                    "type": "integer"
+                },
+                "cost": {
+                    "type": "integer"
+                },
+                "cover_url": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }

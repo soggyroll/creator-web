@@ -14,6 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
 
 export default function GenerationsPage() {
   const { data: generations, isLoading } = useGenerations({ limit: 100 });
@@ -55,24 +56,20 @@ export default function GenerationsPage() {
         </div>
       ) : (
         <div className="flex flex-col divide-y rounded-lg border">
-          {generations.data.map((item) => {
-            const gen = item.generation;
-            const thumbnail = gen.attachments?.find(
-              (a) => a.type === "image",
-            )?.url;
-
+          {generations.data.map((gen) => {
             return (
               <div
-                key={gen?.id}
+                key={gen.id}
                 className="flex items-center gap-4 px-4 py-3 transition-colors hover:bg-muted/40"
               >
                 {/* Thumbnail */}
                 <div className="size-12 shrink-0 overflow-hidden rounded-md bg-muted">
-                  {thumbnail ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={thumbnail}
+                  {gen.output_url ? (
+                    <Image
+                      src={gen.output_url}
                       alt=""
+                      width={48}
+                      height={48}
                       className="size-full object-cover"
                     />
                   ) : (
@@ -85,36 +82,31 @@ export default function GenerationsPage() {
                 {/* Info */}
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">
-                    {gen?.prompt ?? "Untitled generation"}
+                    {gen.workflow.name}
                   </p>
                   <p className="mt-0.5 font-mono text-xs text-muted-foreground">
-                    {gen?.id?.slice(0, 8)}…
-                    {gen?.enqueued_at && (
-                      <span className="ml-2 not-mono font-sans">
-                        · {new Date(gen.enqueued_at).toLocaleString()}
-                      </span>
-                    )}
+                    <span className="ml-2 not-mono font-sans">
+                      {new Date(gen.enqueued_at).toLocaleString()}
+                    </span>
                   </p>
                 </div>
 
                 {/* Credits */}
-                {
-                  <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
-                    {"0"} cr
-                  </span>
-                }
+                <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+                  {gen.workflow.cost} cr
+                </span>
 
                 {/* Status */}
                 <Badge
-                  variant={statusVariant(gen?.status)}
-                  className={statusColorClass(gen?.status)}
+                  variant={statusVariant(gen.status)}
+                  className={statusColorClass(gen.status)}
                 >
-                  {formatGenerationStatus(gen?.status)}
+                  {formatGenerationStatus(gen.status)}
                 </Badge>
 
                 {/* Action */}
                 <Button variant="ghost" size="sm" asChild className="shrink-0">
-                  <Link href={`/generations/${gen?.id}`}>View</Link>
+                  <Link href={`/generations/${gen.id}`}>View</Link>
                 </Button>
               </div>
             );

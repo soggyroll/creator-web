@@ -39,18 +39,15 @@ function getStepIndex(status: string | undefined) {
 }
 
 interface GenerationDetailPageProps {
-  params: Promise<{
-    id: string;
-  }>;
+  params: Promise<{ id: string }>;
 }
 
 export default function GenerationDetailPage({
   params,
 }: GenerationDetailPageProps) {
   const { id } = use(params);
-  const { data: result, isLoading } = useGeneration(id);
+  const { data: gen, isLoading } = useGeneration(id);
 
-  const gen = result?.generation;
   const activeStep = getStepIndex(gen?.status);
   const isFailed = gen?.status === "failed";
 
@@ -69,7 +66,7 @@ export default function GenerationDetailPage({
       <div className="mt-6 flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-2xl font-semibold tracking-tight">
-            {gen?.prompt ?? "Untitled generation"}
+            {gen?.workflow?.name ?? "Generation"}
           </h1>
           {gen?.id && (
             <p className="mt-1 font-mono text-xs text-muted-foreground">
@@ -154,7 +151,7 @@ export default function GenerationDetailPage({
           </p>
           {isLoading ? (
             <div className="flex flex-col gap-3">
-              {Array.from({ length: 4 }).map((_, i) => (
+              {Array.from({ length: 5 }).map((_, i) => (
                 <Skeleton key={i} className="h-4 w-full" />
               ))}
             </div>
@@ -184,7 +181,10 @@ export default function GenerationDetailPage({
                     : "—"
                 }
               />
-              <DetailRow label="Credit cost" value={"0"} />
+              <DetailRow
+                label="Credit cost"
+                value={gen?.workflow?.cost != null ? `${gen.workflow.cost}` : "—"}
+              />
               {gen?.prompt && (
                 <div className="py-3">
                   <dt className="mb-1 text-xs text-muted-foreground">Prompt</dt>
@@ -202,6 +202,72 @@ export default function GenerationDetailPage({
               </p>
             </div>
           )}
+
+          {/* Workflow card */}
+          {gen?.workflow && (
+            <div className="mt-6">
+              <p className="mb-3 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                Workflow
+              </p>
+              <Link
+                href={`/workflows/${gen.workflow.id}`}
+                className="flex items-center gap-3 rounded-xl border border-border p-3 transition-colors hover:bg-muted/40"
+              >
+                {gen.workflow.cover_url ? (
+                  <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-muted">
+                    <Image
+                      src={gen.workflow.cover_url}
+                      alt={gen.workflow.name}
+                      fill
+                      className="object-cover"
+                      sizes="48px"
+                    />
+                  </div>
+                ) : (
+                  <div className="size-12 shrink-0 rounded-lg bg-muted" />
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">
+                    {gen.workflow.name}
+                  </p>
+                  {gen.workflow.description && (
+                    <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                      {gen.workflow.description}
+                    </p>
+                  )}
+                </div>
+                <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
+                  {gen.workflow.avg_time}s · {gen.workflow.cost} cr
+                </span>
+              </Link>
+            </div>
+          )}
+
+          {/* Submitted by */}
+          {gen?.user && (
+            <div className="mt-6">
+              <p className="mb-3 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                Submitted by
+              </p>
+              <div className="flex items-center gap-2.5">
+                {gen.user.avatar_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={gen.user.avatar_url}
+                    alt={gen.user.name}
+                    className="size-7 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex size-7 items-center justify-center rounded-full bg-muted">
+                    <span className="text-xs font-medium text-muted-foreground">
+                      {gen.user.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
+                <span className="text-sm">{gen.user.name}</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Output */}
@@ -210,7 +276,7 @@ export default function GenerationDetailPage({
             <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
               Output
             </p>
-            {result?.output_url && (
+            {gen?.output_url && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -218,7 +284,7 @@ export default function GenerationDetailPage({
                 className="-mr-2 h-7 gap-1.5 text-xs"
               >
                 <a
-                  href={result.output_url}
+                  href={gen.output_url}
                   download
                   target="_blank"
                   rel="noopener noreferrer"
@@ -232,10 +298,10 @@ export default function GenerationDetailPage({
 
           {isLoading ? (
             <Skeleton className="aspect-square w-full rounded-xl" />
-          ) : result?.output_url ? (
+          ) : gen?.output_url ? (
             <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-muted">
               <Image
-                src={result.output_url}
+                src={gen.output_url}
                 alt="Generation output"
                 fill
                 className="object-contain"
@@ -258,10 +324,10 @@ export default function GenerationDetailPage({
             </div>
           )}
 
-          {result?.output_expiry && (
+          {gen?.output_expiry && (
             <p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
               <TimerIcon className="size-3" />
-              Expires {new Date(result.output_expiry).toLocaleDateString()}
+              Expires {new Date(gen.output_expiry).toLocaleDateString()}
             </p>
           )}
         </div>

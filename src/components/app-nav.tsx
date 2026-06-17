@@ -22,12 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 const navLinks = [
   { label: "Discover", href: "/discover" },
@@ -52,11 +46,6 @@ function TeamSelect() {
         {teams.map((team) => (
           <SelectItem key={team.id} value={team.id!}>
             <span>{team.name}</span>
-            {/* {team.role && (
-              <span className="ml-1.5 text-xs text-muted-foreground">
-                {team.role}
-              </span>
-            )} */}
           </SelectItem>
         ))}
       </SelectContent>
@@ -124,34 +113,13 @@ export function AppNav() {
             <>
               <TeamSelect />
 
-              {hasWorkflowCreation ? (
+              {hasWorkflowCreation && (
                 <Button size="sm" variant="outline" asChild>
                   <Link href="/workflows/new">
                     <PlusIcon className="size-3.5" />
                     Create
                   </Link>
                 </Button>
-              ) : (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          disabled
-                          className="pointer-events-none opacity-50"
-                        >
-                          <PlusIcon className="size-3.5" />
-                          Create
-                        </Button>
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      Workflow creation is not enabled for this team
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
               )}
 
               <div className="flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 px-3 py-1">

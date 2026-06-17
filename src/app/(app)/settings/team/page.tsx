@@ -20,7 +20,11 @@ import { useUpdateMemberRole } from "@/hooks/team/use-update-member-role";
 import { TEAMS_QUERY_KEY } from "@/hooks/team/use-teams";
 import { CURRENT_TEAM_QUERY_KEY } from "@/hooks/team/use-team";
 import { setTeamCookie } from "@/actions/team";
-import type { TeamMemberView, TeamRole, TeamWithMembership } from "@/types/api/teams";
+import type {
+  TeamMemberView,
+  TeamRole,
+  TeamWithMembership,
+} from "@/types/api/teams";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -93,7 +97,9 @@ export default function TeamSettingsPage() {
   const [editingGeneral, setEditingGeneral] = useState(false);
 
   const { mutate: patchTeam, isPending: patching } = usePatchTeam(teamId ?? "");
-  const { mutate: archiveTeam, isPending: archiving } = useArchiveTeam(teamId ?? "");
+  const { mutate: archiveTeam, isPending: archiving } = useArchiveTeam(
+    teamId ?? "",
+  );
   const { mutate: leaveTeam, isPending: leaving } = useLeaveTeam(teamId ?? "");
 
   // ── Members section state ─────────────────────────────────────────────────
@@ -102,8 +108,11 @@ export default function TeamSettingsPage() {
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
 
-  const { mutate: addMember, isPending: addingMember } = useAddTeamMember(teamId ?? "");
-  const { mutate: removeMember, isPending: removingMember } = useRemoveTeamMember(teamId ?? "");
+  const { mutate: addMember, isPending: addingMember } = useAddTeamMember(
+    teamId ?? "",
+  );
+  const { mutate: removeMember, isPending: removingMember } =
+    useRemoveTeamMember(teamId ?? "");
   const { mutate: updateRole } = useUpdateMemberRole(teamId ?? "");
 
   // ── Derived ───────────────────────────────────────────────────────────────
@@ -208,7 +217,11 @@ export default function TeamSettingsPage() {
 
   function handleRoleChange(member: TeamMemberView, role: TeamRole) {
     const memberOwners = activeMembers.filter((m) => m.role === "OWNER");
-    if (member.role === "OWNER" && memberOwners.length === 1 && role !== "OWNER") {
+    if (
+      member.role === "OWNER" &&
+      memberOwners.length === 1 &&
+      role !== "OWNER"
+    ) {
       toast.error("Cannot demote the last owner");
       return;
     }
@@ -301,13 +314,10 @@ export default function TeamSettingsPage() {
               <p className="text-xs text-muted-foreground mb-0.5">Slug</p>
               <p className="font-medium">{team.slug ?? "—"}</p>
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground mb-0.5">Team ID</p>
-              <p className="font-mono text-xs text-muted-foreground">{team.id}</p>
-            </div>
+
             <div>
               <p className="text-xs text-muted-foreground mb-0.5">Your role</p>
-              <Badge variant={roleBadgeVariant(myRole!)}>{myRole}</Badge>
+              <p className="font-medium">{myRole?.toLowerCase()}</p>
             </div>
           </div>
         )}
@@ -346,7 +356,9 @@ export default function TeamSettingsPage() {
                 <TableHead>Member</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Joined</TableHead>
-                {canEdit && <TableHead className="text-right">Actions</TableHead>}
+                {canEdit && (
+                  <TableHead className="text-right">Actions</TableHead>
+                )}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -411,9 +423,7 @@ export default function TeamSettingsPage() {
                           </SelectContent>
                         </Select>
                       ) : (
-                        <Badge variant={roleBadgeVariant(member.role)}>
-                          {member.role}
-                        </Badge>
+                        <p>{member.role.toLocaleLowerCase()}</p>
                       )}
                     </TableCell>
                     <TableCell className="text-muted-foreground text-xs">
@@ -444,7 +454,9 @@ export default function TeamSettingsPage() {
         {/* Add member form */}
         {canEdit && (
           <div className="flex flex-col gap-3 pt-2 border-t border-border">
-            <p className="text-xs font-medium text-muted-foreground">Add member</p>
+            <p className="text-xs font-medium text-muted-foreground">
+              Add member
+            </p>
             <div className="flex items-end gap-2">
               <Field className="flex-1">
                 <FieldLabel htmlFor="new-user-id">User ID</FieldLabel>
@@ -555,7 +567,10 @@ export default function TeamSettingsPage() {
                 Archive team
               </Button>
             ) : (
-              <Dialog open={archiveDialogOpen} onOpenChange={setArchiveDialogOpen}>
+              <Dialog
+                open={archiveDialogOpen}
+                onOpenChange={setArchiveDialogOpen}
+              >
                 <DialogTrigger asChild>
                   <Button size="sm" variant="destructive">
                     Archive team
