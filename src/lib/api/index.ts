@@ -49,7 +49,7 @@ import {
   BatchWithGenerations,
 } from "@/types/api/batches";
 import { User } from "@/types/api/user";
-import { apiClient } from "../api-client";
+import { apiClient, publicApiClient } from "../api-client";
 import { Workflow } from "@/types/entities";
 import { Generation } from "@/types/entities/generation";
 
@@ -204,7 +204,9 @@ export const api = {
 
   invites: {
     getInfo: async (token: string): Promise<TeamInviteView> => {
-      const { data } = await apiClient.get<TeamInviteView>(`/invites/${token}`);
+      const { data } = await publicApiClient.get<TeamInviteView>(
+        `/invites/${token}`,
+      );
       return data;
     },
     accept: async (token: string): Promise<void> => {

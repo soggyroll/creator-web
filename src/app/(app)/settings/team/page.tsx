@@ -8,19 +8,23 @@ import { useAuth } from "@clerk/nextjs";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
+import { CheckIcon, CopyIcon, LinkIcon } from "lucide-react";
 
 import { useTeam } from "@/hooks/team/use-team";
 import { useTeamMembers } from "@/hooks/team/use-team-members";
 import { usePatchTeam } from "@/hooks/team/use-patch-team";
 import { useArchiveTeam } from "@/hooks/team/use-archive-team";
 import { useLeaveTeam } from "@/hooks/team/use-leave-team";
-import { useAddTeamMember } from "@/hooks/team/use-add-team-member";
 import { useRemoveTeamMember } from "@/hooks/team/use-remove-team-member";
 import { useUpdateMemberRole } from "@/hooks/team/use-update-member-role";
+import { useTeamInvites } from "@/hooks/team/use-team-invites";
+import { useCreateTeamInvite } from "@/hooks/team/use-create-team-invite";
+import { useRevokeTeamInvite } from "@/hooks/team/use-revoke-team-invite";
 import { TEAMS_QUERY_KEY } from "@/hooks/team/use-teams";
 import { CURRENT_TEAM_QUERY_KEY } from "@/hooks/team/use-team";
 import { setTeamCookie } from "@/actions/team";
 import type {
+  TeamInvite,
   TeamMemberView,
   TeamRole,
   TeamWithMembership,
@@ -28,7 +32,6 @@ import type {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -68,6 +71,10 @@ function extractErrorMessage(error: unknown): string {
   );
 }
 
+function inviteUrl(token: string): string {
+  return `${window.location.origin}/invite/${token}`;
+}
+
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function TeamSettingsPage() {
@@ -89,17 +96,26 @@ export default function TeamSettingsPage() {
   const { mutate: leaveTeam, isPending: leaving } = useLeaveTeam(teamId ?? "");
 
   // ── Members section state ─────────────────────────────────────────────────
-  const [newUserId, setNewUserId] = useState("");
-  const [newRole, setNewRole] = useState<TeamRole>("MEMBER");
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
 
-  const { mutate: addMember, isPending: addingMember } = useAddTeamMember(
-    teamId ?? "",
-  );
   const { mutate: removeMember, isPending: removingMember } =
     useRemoveTeamMember(teamId ?? "");
   const { mutate: updateRole } = useUpdateMemberRole(teamId ?? "");
+
+  // ── Invite links state ────────────────────────────────────────────────────
+  const { data: invites, isLoading: invitesLoading } = useTeamInvites(
+    teamId ?? null,
+  );
+  const { mutate: createInvite, isPending: creatingInvite } =
+    useCreateTeamInvite(teamId ?? "");
+  const { mutate: revokeInvite } = useRevokeTeamInvite(teamId ?? "");
+
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [inviteExpiryDays, setInviteExpiryDays] = useState("7");
+  const [inviteMaxUses, setInviteMaxUses] = useState("unlimited");
+  const [createdInvite, setCreatedInvite] = useState<TeamInvite | null>(null);
+  const [copied, setCopied] = useState(false);
 
   // ── Derived ───────────────────────────────────────────────────────────────
   const myRole = team?.role;
@@ -171,24 +187,6 @@ export default function TeamSettingsPage() {
     });
   }
 
-  function handleAddMember() {
-    if (!newUserId.trim()) {
-      toast.error("User ID is required");
-      return;
-    }
-    addMember(
-      { user_id: newUserId.trim(), role: newRole },
-      {
-        onSuccess: () => {
-          toast.success("Member added");
-          setNewUserId("");
-          setNewRole("MEMBER");
-        },
-        onError: (err) => toast.error(extractErrorMessage(err)),
-      },
-    );
-  }
-
   function handleRemoveMember(member: TeamMemberView) {
     const memberOwners = activeMembers.filter((m) => m.role === "OWNER");
     if (member.role === "OWNER" && memberOwners.length === 1) {
@@ -217,6 +215,45 @@ export default function TeamSettingsPage() {
         onError: (err) => toast.error(extractErrorMessage(err)),
       },
     );
+  }
+
+  function handleCreateInvite() {
+    const expiryDays =
+      inviteExpiryDays === "never" ? undefined : parseInt(inviteExpiryDays, 10);
+    const maxUses =
+      inviteMaxUses === "unlimited" ? undefined : parseInt(inviteMaxUses, 10);
+
+    createInvite(
+      { expires_in_days: expiryDays, max_uses: maxUses },
+      {
+        onSuccess: (invite) => {
+          setCreatedInvite(invite);
+        },
+        onError: (err) => toast.error(extractErrorMessage(err)),
+      },
+    );
+  }
+
+  function handleCopyInviteLink(token: string) {
+    navigator.clipboard.writeText(inviteUrl(token)).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  function handleCloseInviteDialog() {
+    setInviteDialogOpen(false);
+    setCreatedInvite(null);
+    setCopied(false);
+    setInviteExpiryDays("7");
+    setInviteMaxUses("unlimited");
+  }
+
+  function handleRevokeInvite(token: string) {
+    revokeInvite(token, {
+      onSuccess: () => toast.success("Invite link revoked"),
+      onError: (err) => toast.error(extractErrorMessage(err)),
+    });
   }
 
   // ── Loading state ─────────────────────────────────────────────────────────
@@ -423,48 +460,203 @@ export default function TeamSettingsPage() {
           </Table>
         )}
 
-        {/* Add member form */}
-        {canEdit && (
-          <div className="flex flex-col gap-3 pt-2 border-t border-border">
-            <p className="text-xs font-medium text-muted-foreground">
-              Add member
-            </p>
-            <div className="flex items-end gap-2">
-              <Field className="flex-1">
-                <FieldLabel htmlFor="new-user-id">User ID</FieldLabel>
-                <Input
-                  id="new-user-id"
-                  placeholder="user_…"
-                  value={newUserId}
-                  onChange={(e) => setNewUserId(e.target.value)}
-                />
-              </Field>
-              <Field className="w-32">
-                <FieldLabel htmlFor="new-role">Role</FieldLabel>
-                <Select
-                  value={newRole}
-                  onValueChange={(v) => setNewRole(v as TeamRole)}
-                >
-                  <SelectTrigger id="new-role">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {isOwner && <SelectItem value="OWNER">Owner</SelectItem>}
-                    <SelectItem value="ADMIN">Admin</SelectItem>
-                    <SelectItem value="MEMBER">Member</SelectItem>
-                  </SelectContent>
-                </Select>
-              </Field>
-              <Button
-                onClick={handleAddMember}
-                disabled={addingMember || !newUserId.trim()}
-              >
-                {addingMember ? "Adding…" : "Add"}
-              </Button>
-            </div>
-          </div>
-        )}
       </section>
+
+      {/* ── Invite links ─────────────────────────────────────────────────── */}
+      {canEdit && (
+        <section className="rounded-2xl border border-border p-6 flex flex-col gap-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                Invite links
+              </h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Anyone who uses an invite link joins as a Member and can spend
+                this team&apos;s credits on generations.
+              </p>
+            </div>
+
+            {/* Create invite dialog */}
+            <Dialog
+              open={inviteDialogOpen}
+              onOpenChange={(open) => {
+                if (!open) handleCloseInviteDialog();
+                else setInviteDialogOpen(true);
+              }}
+            >
+              <DialogTrigger asChild>
+                <Button size="sm" variant="outline" className="shrink-0">
+                  <LinkIcon className="size-3.5" />
+                  Create link
+                </Button>
+              </DialogTrigger>
+
+              <DialogContent>
+                {createdInvite ? (
+                  /* ── Step 2: show the created link ── */
+                  <>
+                    <DialogHeader>
+                      <DialogTitle>Invite link created</DialogTitle>
+                      <DialogDescription>
+                        Share this link. Whoever uses it will join{" "}
+                        <strong>{team.name}</strong> as a Member and can spend
+                        the team&apos;s credits on generations.
+                      </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="flex gap-2 py-1">
+                      <Input
+                        readOnly
+                        value={inviteUrl(createdInvite.token)}
+                        className="font-mono text-xs"
+                        onFocus={(e) => e.target.select()}
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="shrink-0"
+                        onClick={() =>
+                          handleCopyInviteLink(createdInvite.token)
+                        }
+                      >
+                        {copied ? (
+                          <CheckIcon className="size-4" />
+                        ) : (
+                          <CopyIcon className="size-4" />
+                        )}
+                      </Button>
+                    </div>
+
+                    <p className="text-xs text-muted-foreground">
+                      Expires{" "}
+                      {new Date(createdInvite.expires_at).toLocaleDateString(
+                        undefined,
+                        { month: "long", day: "numeric", year: "numeric" },
+                      )}
+                      {createdInvite.max_uses != null
+                        ? ` · max ${createdInvite.max_uses} ${createdInvite.max_uses === 1 ? "use" : "uses"}`
+                        : ""}
+                    </p>
+
+                    <DialogFooter>
+                      <Button onClick={handleCloseInviteDialog}>Done</Button>
+                    </DialogFooter>
+                  </>
+                ) : (
+                  /* ── Step 1: configure the invite ── */
+                  <>
+                    <DialogHeader>
+                      <DialogTitle>Create invite link</DialogTitle>
+                      <DialogDescription>
+                        Anyone with this link will join{" "}
+                        <strong>{team.name}</strong> as a Member. Members can
+                        spend the team&apos;s credits on generations and access
+                        shared workflows.
+                      </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="flex flex-col gap-4 py-1">
+                      <Field>
+                        <FieldLabel>Expires after</FieldLabel>
+                        <Select
+                          value={inviteExpiryDays}
+                          onValueChange={setInviteExpiryDays}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1">1 day</SelectItem>
+                            <SelectItem value="7">7 days</SelectItem>
+                            <SelectItem value="30">30 days</SelectItem>
+                            <SelectItem value="never">Never</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </Field>
+
+                      <Field>
+                        <FieldLabel>Max uses</FieldLabel>
+                        <Select
+                          value={inviteMaxUses}
+                          onValueChange={setInviteMaxUses}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1">1 use</SelectItem>
+                            <SelectItem value="5">5 uses</SelectItem>
+                            <SelectItem value="10">10 uses</SelectItem>
+                            <SelectItem value="unlimited">Unlimited</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </Field>
+                    </div>
+
+                    <DialogFooter>
+                      <Button
+                        variant="outline"
+                        onClick={handleCloseInviteDialog}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={handleCreateInvite}
+                        disabled={creatingInvite}
+                      >
+                        {creatingInvite ? "Creating…" : "Create link"}
+                      </Button>
+                    </DialogFooter>
+                  </>
+                )}
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {/* Active invites list */}
+          {invitesLoading ? (
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          ) : !invites?.length ? (
+            <p className="text-center text-xs text-muted-foreground py-6">
+              No active invite links. Create one to share with someone.
+            </p>
+          ) : (
+            <div className="flex flex-col divide-y rounded-lg border">
+              {invites.map((invite) => (
+                <div
+                  key={invite.id}
+                  className="flex items-center gap-3 px-4 py-3"
+                >
+                  <code className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground">
+                    /invite/
+                    {invite.token.length > 12
+                      ? `…${invite.token.slice(-8)}`
+                      : invite.token}
+                  </code>
+                  <span className="shrink-0 text-xs text-muted-foreground">
+                    Expires {formatDate(invite.expires_at)}
+                  </span>
+                  <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+                    {invite.use_count}&thinsp;/&thinsp;
+                    {invite.max_uses ?? "∞"}
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="shrink-0 text-destructive hover:text-destructive"
+                    onClick={() => handleRevokeInvite(invite.token)}
+                  >
+                    Revoke
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
       {/* ── Danger zone ──────────────────────────────────────────────────── */}
       <section className="rounded-2xl border border-destructive/30 p-6 flex flex-col gap-4">
