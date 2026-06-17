@@ -52,11 +52,11 @@ function TeamSelect() {
         {teams.map((team) => (
           <SelectItem key={team.id} value={team.id!}>
             <span>{team.name}</span>
-            {team.role && (
+            {/* {team.role && (
               <span className="ml-1.5 text-xs text-muted-foreground">
                 {team.role}
               </span>
-            )}
+            )} */}
           </SelectItem>
         ))}
       </SelectContent>

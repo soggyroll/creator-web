@@ -12,6 +12,7 @@ export interface Team {
   created_by_user_id?: string;
   features: TeamFeature[];
   id: string;
+  is_personal: boolean;
   name: string;
   slug?: string;
   updated_at?: string;
@@ -23,6 +24,7 @@ export interface TeamWithMembership {
   created_by_user_id?: string;
   features: TeamFeature[];
   id: string;
+  is_personal: boolean;
   joined_at?: string;
   name: string;
   role?: TeamRole;

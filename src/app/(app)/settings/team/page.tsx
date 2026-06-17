@@ -538,47 +538,55 @@ export default function TeamSettingsPage() {
           )}
         </div>
 
-        {/* Archive team — OWNER only */}
+        {/* Archive team — OWNER only, blocked for personal teams */}
         {isOwner && (
           <div className="flex items-center justify-between gap-4 pt-4 border-t border-destructive/20">
             <div>
               <p className="text-sm font-medium">Archive team</p>
               <p className="text-xs text-muted-foreground">
-                Deactivates the team. Members will lose access immediately.
+                {team.is_personal
+                  ? "Personal teams cannot be archived."
+                  : "Deactivates the team. Members will lose access immediately."}
               </p>
             </div>
 
-            <Dialog open={archiveDialogOpen} onOpenChange={setArchiveDialogOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" variant="destructive">
-                  Archive team
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Archive {team.name}?</DialogTitle>
-                  <DialogDescription>
-                    This will deactivate the team and revoke access for all
-                    members. Are you sure you want to continue?
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button
-                    variant="outline"
-                    onClick={() => setArchiveDialogOpen(false)}
-                  >
-                    Cancel
+            {team.is_personal ? (
+              <Button size="sm" variant="destructive" disabled>
+                Archive team
+              </Button>
+            ) : (
+              <Dialog open={archiveDialogOpen} onOpenChange={setArchiveDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="destructive">
+                    Archive team
                   </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={handleArchive}
-                    disabled={archiving}
-                  >
-                    {archiving ? "Archiving…" : "Archive team"}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Archive {team.name}?</DialogTitle>
+                    <DialogDescription>
+                      This will deactivate the team and revoke access for all
+                      members. Are you sure you want to continue?
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setArchiveDialogOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={handleArchive}
+                      disabled={archiving}
+                    >
+                      {archiving ? "Archiving…" : "Archive team"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
         )}
       </section>
