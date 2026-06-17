@@ -24,6 +24,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { formatDurationCompact } from "@/lib/utils";
 
 const STEPS = [
   { key: "queued", label: "Queued", icon: ClockIcon },
@@ -50,6 +51,11 @@ export default function GenerationDetailPage({
 
   const activeStep = getStepIndex(gen?.status);
   const isFailed = gen?.status === "failed";
+
+  const timeTakenFormatted = formatDurationCompact(
+    gen?.enqueued_at,
+    gen?.finished_at,
+  );
 
   return (
     <div className="mx-auto w-full max-w-4xl px-6 py-8">
@@ -183,8 +189,11 @@ export default function GenerationDetailPage({
               />
               <DetailRow
                 label="Credit cost"
-                value={gen?.workflow?.cost != null ? `${gen.workflow.cost}` : "—"}
+                value={
+                  gen?.workflow?.cost != null ? `${gen.workflow.cost}` : "—"
+                }
               />
+              <DetailRow label="Time taken" value={timeTakenFormatted} />
               {gen?.prompt && (
                 <div className="py-3">
                   <dt className="mb-1 text-xs text-muted-foreground">Prompt</dt>
