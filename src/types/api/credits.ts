@@ -7,6 +7,4 @@ export interface CreditBalanceResponse {
   team_id: string;
 }
 
-export interface LedgeHistoryResponse {
-  data: LedgerEntry[];
-}
+export type LedgeHistoryResponse = { data: LedgerEntry[] };

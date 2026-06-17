@@ -239,7 +239,7 @@ export default function TeamSettingsPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Team settings</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Manage {team.name}&apos;s info, features, and members.
+          Manage {team.name}&apos;s info, and members.
         </p>
       </div>
 
@@ -304,20 +304,6 @@ export default function TeamSettingsPage() {
             <div>
               <p className="text-xs text-muted-foreground mb-0.5">Your role</p>
               <p className="font-medium">{myRole?.toLowerCase()}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Features */}
-        {team.features.length > 0 && (
-          <div>
-            <p className="text-xs text-muted-foreground mb-2">Features</p>
-            <div className="flex flex-wrap gap-1.5">
-              {team.features.map((f) => (
-                <Badge key={f} variant="secondary">
-                  {f === "workflow_creation" ? "Workflow Creation" : f}
-                </Badge>
-              ))}
             </div>
           </div>
         )}
@@ -413,7 +399,7 @@ export default function TeamSettingsPage() {
                       )}
                     </TableCell>
                     <TableCell className="text-muted-foreground text-xs">
-                      {formatDate(member.joined_at)}
+                      {member.joined_at ? formatDate(member.joined_at) : "—"}
                     </TableCell>
                     {canEdit && (
                       <TableCell className="text-right">

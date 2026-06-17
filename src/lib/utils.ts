@@ -8,12 +8,20 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatLedgerEntryKind(kind: "charge" | "refund") {
+export function formatLedgerEntryKind(
+  kind: "charge" | "refund" | "purchase" | "grant" | "adjustment",
+) {
   switch (kind) {
     case "charge":
       return "Charge";
     case "refund":
       return "Refund";
+    case "purchase":
+      return "Purchase";
+    case "grant":
+      return "Grant";
+    case "adjustment":
+      return "Adjustment";
     default:
       return kind;
   }
