@@ -24,6 +24,7 @@ export interface Workflow {
   updated_at: string;
   user: WorkflowUserRef;
   viewer: WorkflowViewer;
+  replaceable_nodes: ReplaceableNode[];
 }
 
 /** Full domain object returned from POST /workflows and PATCH /workflows/{id} */
