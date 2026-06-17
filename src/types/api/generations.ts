@@ -1,43 +1,5 @@
 /** @format */
 
-export interface Generation {
-  attachments?: Attachment[];
-  batch_id?: string;
-  enqueued_at?: string;
-  error_log?: string;
-  execution_stage?: string;
-  fault_source?: FaultSource;
-  finished_at?: string;
-  id: string;
-  instance_id?: string;
-  output_expires_at?: string;
-  output_s3_key?: string;
-  priority?: BatchPriority;
-  prompt?: string;
-  retry_count?: number;
-  runtime_status?: number[];
-  started_at?: string;
-  status?: GenerationStatus;
-  team_id?: string;
-  user_id?: string;
-  workflow_id?: string;
-  workflow_inputs?: WorkflowInputs;
-}
-
-export interface GenerationResponse {
-  generation: Generation;
-  output_expiry?: string;
-  output_url?: string;
-}
-
-export interface ListGenerationResponse {
-  data: {
-    generation: Generation;
-    output_expiry?: string;
-    output_url?: string;
-  }[];
-}
-
 export interface Attachment {
   type?: string;
   url?: string;
@@ -46,6 +8,7 @@ export interface Attachment {
 export type FaultSource = string;
 export type BatchPriority = "urgent" | "standard" | "patient";
 export type GenerationStatus = string;
+
 export interface WorkflowInputs {
   asset_ids?: Record<string, string>;
   image_urls: Record<string, string>;
@@ -56,6 +19,50 @@ export interface WorkflowInputsBody {
   asset_ids: Record<string, string>;
   image_urls: Record<string, string>;
   primitive_inputs: Record<string, unknown>;
+}
+
+export interface GenerationUserRef {
+  avatar_url?: string;
+  id: string;
+  name: string;
+}
+
+export interface GenerationWorkflowRef {
+  avg_time: number;
+  cost: number;
+  cover_url?: string;
+  description?: string;
+  id: string;
+  name: string;
+}
+
+export interface GenerationView {
+  attachments: Attachment[];
+  batch_id: string;
+  enqueued_at: string;
+  error_log?: string;
+  execution_stage: string;
+  fault_source?: FaultSource;
+  finished_at?: string;
+  id: string;
+  output_expiry?: string;
+  output_url?: string;
+  priority: BatchPriority;
+  prompt: string;
+  retry_count: number;
+  started_at?: string;
+  status: GenerationStatus;
+  team_id: string;
+  user: GenerationUserRef;
+  workflow: GenerationWorkflowRef;
+  workflow_inputs: WorkflowInputs;
+}
+
+export type GenerationResponse = GenerationView;
+
+export interface ListGenerationResponse {
+  data: GenerationView[];
+  next_cursor: string;
 }
 
 export interface GenerationInput {

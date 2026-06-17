@@ -12,14 +12,13 @@ export function useDashboardStats() {
   const active =
     generations?.data.filter(
       (g) =>
-        g.generation?.status === "queued" ||
-        g.generation?.status === "running" ||
-        g.generation?.status === "retrying",
+        g.status === "queued" ||
+        g.status === "running" ||
+        g.status === "retrying",
     ).length ?? 0;
 
   const completed =
-    generations?.data.filter((g) => g.generation?.status === "completed")
-      .length ?? 0;
+    generations?.data.filter((g) => g.status === "completed").length ?? 0;
 
   return {
     credits: credits?.balance,

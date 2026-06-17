@@ -166,6 +166,111 @@
                 }
             }
         },
+        "/api/v1/admin/generations/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieves a generation by ID across all teams. Requires admin privileges.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Get Generation (Admin)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Generation ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_service_generation.GenerationResult"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/generations/{id}/events": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the ordered event log (coarse status transitions + fine generation-FSM steps) for the given generation ID. Admin only.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Get Generation Event Timeline (Admin)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Generation ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/admin/instances/db": {
             "get": {
                 "security": [
@@ -345,6 +450,65 @@
             }
         },
         "/api/v1/admin/instances/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a tracked VM row, including price fields and provider metadata when available. Admin only.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Get Instance (Admin)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Internal VM UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.InstanceDetail"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
             "delete": {
                 "security": [
                     {
@@ -376,6 +540,59 @@
                             "additionalProperties": {
                                 "type": "string"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/instances/{id}/events": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the ordered event log (coarse state transitions + fine deployment-FSM steps) for the given internal VM ID. Admin only.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Get Instance Event Timeline",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Internal VM UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
@@ -449,6 +666,260 @@
                             "additionalProperties": {
                                 "type": "string"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/observability/generation-step-durations": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns latency statistics per generation FSM step, based on start/end event brackets.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Generation Step Durations (Admin)",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.GenerationStepDurationSummary"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/observability/profitability": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Calculates total credits spent on generations, total USD spend on VMs, and the credits/dollar efficiency ratio. Admin only.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Profitability and Credit Efficiency Overview (Admin)",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.ProfitabilityOverview"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/observability/spend": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Estimates provider spend from instance price_per_hour and billable runtime. Active VMs are counted through the request time. Admin only.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Provider Spend Overview (Admin)",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.SpendOverview"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/teams/{id}/features": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns all feature grants for a team. Admin only.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "List team features (admin)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Team ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Grants a feature (e.g. workflow_creation) to a team. Admin only. Idempotent.",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Grant team feature",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Team ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "feature name",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/teams/{id}/features/{feature}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Removes a feature grant from a team. Admin only. No-op if not granted.",
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Revoke team feature",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Team ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Feature name",
+                        "name": "feature",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
                         }
                     }
                 }
@@ -1134,7 +1605,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.CursorPage-github_com_comfy-creators_creator-backend_internal_service_generation_GenerationResult"
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.CursorPage-github_com_comfy-creators_creator-backend_internal_domain_GenerationView"
                         }
                     },
                     "500": {
@@ -1177,7 +1648,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_service_generation.GenerationResult"
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.GenerationView"
                         }
                     },
                     "403": {
@@ -1398,7 +1869,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns team details. The caller must be an active member.",
+                "description": "Returns team details with features. The caller must be an active member.",
                 "produces": [
                     "application/json"
                 ],
@@ -1450,6 +1921,170 @@
                         }
                     }
                 }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Archives the team. Requires OWNER. Cannot archive if the requester is the last owner.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teams"
+                ],
+                "summary": "Archive Team",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Team ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates team name and slug. Requires OWNER or ADMIN.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teams"
+                ],
+                "summary": "Update Team",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Team ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "name and optional slug",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Team"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/teams/{id}/leave": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Removes the caller from the team. Owners must transfer ownership first.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teams"
+                ],
+                "summary": "Leave Team",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Team ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    }
+                }
             }
         },
         "/api/v1/teams/{id}/members": {
@@ -1459,7 +2094,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns all members of the given team. The caller must be an active member.",
+                "description": "Returns all members of the given team with name and avatar. The caller must be an active member.",
                 "produces": [
                     "application/json"
                 ],
@@ -1482,26 +2117,20 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.TeamMember"
+                                "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.TeamMemberView"
                             }
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
                         }
                     }
                 }
@@ -1647,6 +2276,81 @@
                             "additionalProperties": {
                                 "type": "string"
                             }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Changes a member's role. Requires OWNER or ADMIN. Only an OWNER may grant the OWNER role.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teams"
+                ],
+                "summary": "Update member role",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Team ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "role",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.TeamMember"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
                         }
                     }
                 }
@@ -2051,6 +2755,7 @@
                 "is_public",
                 "model_files",
                 "name",
+                "replaceable_nodes",
                 "required_vram_gb"
             ],
             "properties": {
@@ -2087,6 +2792,12 @@
                 "name": {
                     "type": "string"
                 },
+                "replaceable_nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.ReplaceableNode"
+                    }
+                },
                 "required_vram_gb": {
                     "type": "integer",
                     "minimum": 0
@@ -2121,6 +2832,24 @@
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Batch"
+                    }
+                },
+                "next_cursor": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.CursorPage-github_com_comfy-creators_creator-backend_internal_domain_GenerationView": {
+            "type": "object",
+            "required": [
+                "data",
+                "next_cursor"
+            ],
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.GenerationView"
                     }
                 },
                 "next_cursor": {
@@ -2209,7 +2938,7 @@
             ],
             "properties": {
                 "inputs": {
-                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.WorkflowInputsBody"
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.WorkflowInputs"
                 },
                 "prompt": {
                     "type": "string"
@@ -2279,11 +3008,15 @@
         "github_com_comfy-creators_creator-backend_internal_api_dto.InitAssetUploadRequest": {
             "type": "object",
             "required": [
+                "asset_type",
                 "content_type",
                 "filename",
                 "size_bytes"
             ],
             "properties": {
+                "asset_type": {
+                    "type": "string"
+                },
                 "content_type": {
                     "type": "string"
                 },
@@ -2308,6 +3041,9 @@
                     "type": "string"
                 },
                 "expires_at": {
+                    "type": "string"
+                },
+                "public_url": {
                     "type": "string"
                 },
                 "s3_key": {
@@ -2345,6 +3081,7 @@
                 "is_public",
                 "model_files",
                 "name",
+                "replaceable_nodes",
                 "required_vram_gb"
             ],
             "properties": {
@@ -2378,34 +3115,14 @@
                 "name": {
                     "type": "string"
                 },
+                "replaceable_nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.ReplaceableNode"
+                    }
+                },
                 "required_vram_gb": {
                     "type": "integer"
-                }
-            }
-        },
-        "github_com_comfy-creators_creator-backend_internal_api_dto.WorkflowInputsBody": {
-            "type": "object",
-            "required": [
-                "asset_ids",
-                "image_urls",
-                "primitive_inputs"
-            ],
-            "properties": {
-                "asset_ids": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "image_urls": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "primitive_inputs": {
-                    "type": "object",
-                    "additionalProperties": {}
                 }
             }
         },
@@ -2726,13 +3443,15 @@
                 "input",
                 "output",
                 "lora",
-                "checkpoint"
+                "checkpoint",
+                "cover"
             ],
             "x-enum-varnames": [
                 "AssetTypeInput",
                 "AssetTypeOutput",
                 "AssetTypeLora",
-                "AssetTypeCheckpoint"
+                "AssetTypeCheckpoint",
+                "AssetTypeCover"
             ]
         },
         "github_com_comfy-creators_creator-backend_internal_domain.Attachment": {
@@ -2813,6 +3532,33 @@
                 "BatchStatusPartialFailure",
                 "BatchStatusFailed"
             ]
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.CurrencySpendSummary": {
+            "type": "object",
+            "required": [
+                "active_instance_count",
+                "billable_seconds",
+                "currency",
+                "estimated_spend",
+                "instance_count"
+            ],
+            "properties": {
+                "active_instance_count": {
+                    "type": "integer"
+                },
+                "billable_seconds": {
+                    "type": "number"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "estimated_spend": {
+                    "type": "number"
+                },
+                "instance_count": {
+                    "type": "integer"
+                }
+            }
         },
         "github_com_comfy-creators_creator-backend_internal_domain.FaultSource": {
             "type": "string",
@@ -2933,10 +3679,185 @@
                 "GenerationStatusRetrying"
             ]
         },
+        "github_com_comfy-creators_creator-backend_internal_domain.GenerationStepDurationSummary": {
+            "type": "object",
+            "required": [
+                "avg_seconds",
+                "failed_count",
+                "finished_count",
+                "max_seconds",
+                "min_seconds",
+                "p50_seconds",
+                "p95_seconds",
+                "sample_count",
+                "started_count",
+                "step"
+            ],
+            "properties": {
+                "avg_seconds": {
+                    "type": "number"
+                },
+                "failed_count": {
+                    "type": "integer"
+                },
+                "finished_count": {
+                    "type": "integer"
+                },
+                "max_seconds": {
+                    "type": "number"
+                },
+                "min_seconds": {
+                    "type": "number"
+                },
+                "p50_seconds": {
+                    "type": "number"
+                },
+                "p95_seconds": {
+                    "type": "number"
+                },
+                "sample_count": {
+                    "type": "integer"
+                },
+                "started_count": {
+                    "type": "integer"
+                },
+                "step": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.GenerationUserRef": {
+            "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.GenerationView": {
+            "type": "object",
+            "required": [
+                "attachments",
+                "batch_id",
+                "enqueued_at",
+                "execution_stage",
+                "id",
+                "priority",
+                "prompt",
+                "retry_count",
+                "status",
+                "team_id",
+                "user",
+                "workflow",
+                "workflow_inputs"
+            ],
+            "properties": {
+                "attachments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Attachment"
+                    }
+                },
+                "batch_id": {
+                    "type": "string"
+                },
+                "enqueued_at": {
+                    "type": "string"
+                },
+                "error_log": {
+                    "type": "string"
+                },
+                "execution_stage": {
+                    "type": "string"
+                },
+                "fault_source": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.FaultSource"
+                },
+                "finished_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "output_expiry": {
+                    "type": "string"
+                },
+                "output_url": {
+                    "type": "string"
+                },
+                "priority": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.BatchPriority"
+                },
+                "prompt": {
+                    "type": "string"
+                },
+                "retry_count": {
+                    "type": "integer"
+                },
+                "started_at": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.GenerationStatus"
+                },
+                "team_id": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.GenerationUserRef"
+                },
+                "workflow": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.GenerationWorkflowRef"
+                },
+                "workflow_inputs": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.WorkflowInputs"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.GenerationWorkflowRef": {
+            "type": "object",
+            "required": [
+                "avg_time",
+                "cost",
+                "id",
+                "name"
+            ],
+            "properties": {
+                "avg_time": {
+                    "type": "integer"
+                },
+                "cost": {
+                    "type": "integer"
+                },
+                "cover_url": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_comfy-creators_creator-backend_internal_domain.Instance": {
             "type": "object",
             "required": [
                 "created_at",
+                "currency",
                 "id",
                 "instance_type",
                 "load_score",
@@ -2950,6 +3871,9 @@
                     "type": "string"
                 },
                 "created_at": {
+                    "type": "string"
+                },
+                "currency": {
                     "type": "string"
                 },
                 "id": {
@@ -2967,11 +3891,16 @@
                 "load_score": {
                     "type": "integer"
                 },
+                "price_per_hour": {
+                    "type": "number"
+                },
                 "provider": {
-                    "description": "e.g., \"vastai\", \"akash\", \"datacrunch\"",
-                    "type": "string"
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_client_mjolnir.ProviderType"
                 },
                 "provider_instance_id": {
+                    "type": "string"
+                },
+                "provisioned_at": {
                     "type": "string"
                 },
                 "state": {
@@ -2979,6 +3908,66 @@
                 },
                 "vram_gb": {
                     "type": "integer"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.InstanceDetail": {
+            "type": "object",
+            "required": [
+                "instance"
+            ],
+            "properties": {
+                "instance": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.Instance"
+                },
+                "provider_metadata": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.InstanceProviderMetadata"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.InstanceProviderMetadata": {
+            "type": "object",
+            "required": [
+                "instance_id",
+                "raw_provider_data",
+                "updated_at"
+            ],
+            "properties": {
+                "gpu_model": {
+                    "type": "string"
+                },
+                "instance_id": {
+                    "type": "string"
+                },
+                "internal_ip": {
+                    "type": "string"
+                },
+                "ogre_url": {
+                    "type": "string"
+                },
+                "preset_id": {
+                    "type": "string"
+                },
+                "public_ip": {
+                    "type": "string"
+                },
+                "raw_provider_data": {
+                    "type": "object"
+                },
+                "region": {
+                    "type": "string"
+                },
+                "ssh_port": {
+                    "type": "integer"
+                },
+                "ssh_username": {
+                    "type": "string"
+                },
+                "tasuke_url": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },
@@ -3079,11 +4068,153 @@
                 "LedgerKindAdjustment"
             ]
         },
+        "github_com_comfy-creators_creator-backend_internal_domain.MemberStatus": {
+            "type": "string",
+            "enum": [
+                "ACTIVE",
+                "LEFT",
+                "REMOVED",
+                "INVITED"
+            ],
+            "x-enum-varnames": [
+                "TeamMemberStatusActive",
+                "TeamMemberStatusLeft",
+                "TeamMemberStatusRemoved",
+                "TeamMemberStatusInvited"
+            ]
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.ProfitabilityOverview": {
+            "type": "object",
+            "required": [
+                "credits_per_usd",
+                "generated_at",
+                "total_credits_spent",
+                "total_spend_usd"
+            ],
+            "properties": {
+                "credits_per_usd": {
+                    "type": "number"
+                },
+                "generated_at": {
+                    "type": "string"
+                },
+                "total_credits_spent": {
+                    "type": "integer"
+                },
+                "total_spend_usd": {
+                    "type": "number"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.ProviderSpendSummary": {
+            "type": "object",
+            "required": [
+                "active_instance_count",
+                "billable_seconds",
+                "currency",
+                "estimated_spend",
+                "instance_count",
+                "provider"
+            ],
+            "properties": {
+                "active_instance_count": {
+                    "type": "integer"
+                },
+                "billable_seconds": {
+                    "type": "number"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "estimated_spend": {
+                    "type": "number"
+                },
+                "instance_count": {
+                    "type": "integer"
+                },
+                "provider": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.ReplaceableNode": {
+            "type": "object",
+            "required": [
+                "class_type",
+                "current_value",
+                "input_field",
+                "input_kind",
+                "node_id",
+                "title",
+                "value_type"
+            ],
+            "properties": {
+                "class_type": {
+                    "type": "string"
+                },
+                "current_value": {},
+                "input_field": {
+                    "type": "string"
+                },
+                "input_kind": {
+                    "type": "string"
+                },
+                "node_id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "value_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.RoleOwner": {
+            "type": "string",
+            "enum": [
+                "OWNER",
+                "ADMIN",
+                "MEMBER"
+            ],
+            "x-enum-varnames": [
+                "TeamRoleOwner",
+                "TeamRoleAdmin",
+                "TeamRoleMember"
+            ]
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.SpendOverview": {
+            "type": "object",
+            "required": [
+                "by_currency",
+                "by_provider",
+                "generated_at"
+            ],
+            "properties": {
+                "by_currency": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.CurrencySpendSummary"
+                    }
+                },
+                "by_provider": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.ProviderSpendSummary"
+                    }
+                },
+                "generated_at": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_comfy-creators_creator-backend_internal_domain.Team": {
             "type": "object",
             "required": [
                 "created_at",
+                "features",
                 "id",
+                "is_personal",
                 "name",
                 "updated_at"
             ],
@@ -3097,8 +4228,17 @@
                 "created_by_user_id": {
                     "type": "string"
                 },
+                "features": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.TeamFeature"
+                    }
+                },
                 "id": {
                     "type": "string"
+                },
+                "is_personal": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"
@@ -3110,6 +4250,15 @@
                     "type": "string"
                 }
             }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.TeamFeature": {
+            "type": "string",
+            "enum": [
+                "workflow_creation"
+            ],
+            "x-enum-varnames": [
+                "FeatureWorkflowCreation"
+            ]
         },
         "github_com_comfy-creators_creator-backend_internal_domain.TeamMember": {
             "type": "object",
@@ -3142,10 +4291,10 @@
                     "type": "string"
                 },
                 "role": {
-                    "type": "string"
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.RoleOwner"
                 },
                 "status": {
-                    "type": "string"
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.MemberStatus"
                 },
                 "team_id": {
                     "type": "string"
@@ -3158,11 +4307,58 @@
                 }
             }
         },
-        "github_com_comfy-creators_creator-backend_internal_domain.TeamWithMembership": {
+        "github_com_comfy-creators_creator-backend_internal_domain.TeamMemberView": {
             "type": "object",
             "required": [
                 "created_at",
                 "id",
+                "role",
+                "status",
+                "team_id",
+                "user_email",
+                "user_id",
+                "user_name"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "joined_at": {
+                    "type": "string"
+                },
+                "role": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.RoleOwner"
+                },
+                "status": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.MemberStatus"
+                },
+                "team_id": {
+                    "type": "string"
+                },
+                "user_avatar_url": {
+                    "type": "string"
+                },
+                "user_email": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.TeamWithMembership": {
+            "type": "object",
+            "required": [
+                "created_at",
+                "features",
+                "id",
+                "is_personal",
                 "name",
                 "role",
                 "status",
@@ -3178,8 +4374,17 @@
                 "created_by_user_id": {
                     "type": "string"
                 },
+                "features": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.TeamFeature"
+                    }
+                },
                 "id": {
                     "type": "string"
+                },
+                "is_personal": {
+                    "type": "boolean"
                 },
                 "joined_at": {
                     "type": "string"
@@ -3243,6 +4448,7 @@
                 "is_public",
                 "model_files",
                 "name",
+                "replaceable_nodes",
                 "required_vram_gb",
                 "team_id",
                 "updated_at",
@@ -3285,6 +4491,12 @@
                 "name": {
                     "type": "string"
                 },
+                "replaceable_nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.ReplaceableNode"
+                    }
+                },
                 "required_vram_gb": {
                     "type": "integer"
                 },
@@ -3301,28 +4513,7 @@
         },
         "github_com_comfy-creators_creator-backend_internal_domain.WorkflowInputs": {
             "type": "object",
-            "required": [
-                "image_urls",
-                "primitive_inputs"
-            ],
-            "properties": {
-                "asset_ids": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "image_urls": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "primitive_inputs": {
-                    "type": "object",
-                    "additionalProperties": {}
-                }
-            }
+            "additionalProperties": {}
         },
         "github_com_comfy-creators_creator-backend_internal_domain.WorkflowPage": {
             "type": "object",

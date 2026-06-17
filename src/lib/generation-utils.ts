@@ -11,9 +11,7 @@ export function formatGenerationStatus(status: string | undefined): string {
   return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
-export function statusVariant(
-  status: string | undefined
-): BadgeVariant {
+export function statusVariant(status: string | undefined): BadgeVariant {
   switch (status) {
     case "failed":
       return "destructive";
