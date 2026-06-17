@@ -50,7 +50,7 @@ export interface TeamMember {
 export interface TeamMemberView {
   created_at: string;
   id: string;
-  joined_at?: string;
+  joined_at: string;
   role: TeamRole;
   status: MemberStatus;
   team_id: string;

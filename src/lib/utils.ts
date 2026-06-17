@@ -1,7 +1,7 @@
 /** @format */
 
 import { clsx, type ClassValue } from "clsx";
-import { intervalToDuration } from "date-fns";
+import { intervalToDuration, formatDate as formatDateFns } from "date-fns";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -33,4 +33,8 @@ export function formatDurationCompact(
   if (minutes) parts.push(`${minutes}m`);
   if (seconds || parts.length === 0) parts.push(`${seconds ?? 0}s`);
   return parts.join(" ");
+}
+
+export function formatDate(iso: string) {
+  return formatDateFns(new Date(iso), "MMM d, yyyy");
 }

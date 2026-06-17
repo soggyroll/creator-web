@@ -55,23 +55,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Field, FieldLabel } from "@/components/ui/field";
+import { formatDate } from "@/lib/utils";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
-
-function roleBadgeVariant(role: TeamRole) {
-  if (role === "OWNER") return "default" as const;
-  if (role === "ADMIN") return "secondary" as const;
-  return "outline" as const;
-}
-
-function formatDate(iso?: string) {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
 
 function extractErrorMessage(error: unknown): string {
   const axiosErr = error as AxiosError<{ error?: string; message?: string }>;
