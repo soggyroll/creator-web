@@ -10,6 +10,7 @@ import { toast } from "sonner";
 
 import { useCreateGeneration } from "@/hooks/use-create-generation";
 import { api } from "@/lib/api";
+import { uploadFileToS3 } from "@/lib/upload";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -87,37 +88,6 @@ function buildWorkflowInputs(mediaInputs: Record<string, DraftMediaInput>) {
   };
 }
 
-function uploadFileToSignedUrl(
-  uploadUrl: string,
-  file: File,
-  onProgress: (progress: number) => void,
-) {
-  return new Promise<void>((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-
-    xhr.open("PUT", uploadUrl);
-    xhr.setRequestHeader("Content-Type", file.type);
-
-    xhr.upload.onprogress = (event) => {
-      if (!event.lengthComputable) return;
-      onProgress(Math.round((event.loaded / event.total) * 90));
-    };
-
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        onProgress(95);
-        resolve();
-        return;
-      }
-
-      reject(new Error(`Upload failed with status ${xhr.status}.`));
-    };
-
-    xhr.onerror = () => reject(new Error("Upload failed. Please try again."));
-    xhr.onabort = () => reject(new Error("Upload was cancelled."));
-    xhr.send(file);
-  });
-}
 
 export default function GenerateForm({ workflowId }: GenerateFormProps) {
   const router = useRouter();
@@ -244,12 +214,13 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
 
     try {
       const upload = await api.assets.initUpload({
+        asset_type: "input",
         filename: file.name,
         content_type: file.type,
         size_bytes: file.size,
       });
 
-      await uploadFileToSignedUrl(upload.upload_url, file, (progress) => {
+      await uploadFileToS3(upload.upload_url, file, (progress) => {
         patchDraftMediaInput(draftId, input.id, uploadId, { progress });
       });
 

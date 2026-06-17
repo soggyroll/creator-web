@@ -5,7 +5,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CreditCardIcon } from "lucide-react";
+import { CreditCardIcon, PlusIcon } from "lucide-react";
 import { useAuth, UserButton } from "@clerk/nextjs";
 
 import { useCreditBalance } from "@/hooks/use-credit-balance";
@@ -66,9 +66,9 @@ export function AppNav() {
           <Image
             src="/soggyroll.png"
             alt="Soggy Roll"
-            width={120}
-            height={33}
-            className="h-8 w-auto"
+            width={120 * 2}
+            height={33 * 2}
+            className="h-10 w-auto"
           />
         </Link>
 
@@ -95,6 +95,12 @@ export function AppNav() {
           {isLoaded && isSignedIn ? (
             <>
               {/* <TeamSelect /> */}
+              <Button size="sm" variant="outline" asChild>
+                <Link href="/workflows/new">
+                  <PlusIcon className="size-3.5" />
+                  Create
+                </Link>
+              </Button>
               <div className="flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 px-3 py-1">
                 <CreditCardIcon className="size-3 text-muted-foreground" />
                 {isLoading ? (

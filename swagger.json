@@ -2608,11 +2608,15 @@
         "github_com_comfy-creators_creator-backend_internal_api_dto.InitAssetUploadRequest": {
             "type": "object",
             "required": [
+                "asset_type",
                 "content_type",
                 "filename",
                 "size_bytes"
             ],
             "properties": {
+                "asset_type": {
+                    "type": "string"
+                },
                 "content_type": {
                     "type": "string"
                 },
@@ -2637,6 +2641,9 @@
                     "type": "string"
                 },
                 "expires_at": {
+                    "type": "string"
+                },
+                "public_url": {
                     "type": "string"
                 },
                 "s3_key": {
@@ -3036,13 +3043,15 @@
                 "input",
                 "output",
                 "lora",
-                "checkpoint"
+                "checkpoint",
+                "cover"
             ],
             "x-enum-varnames": [
                 "AssetTypeInput",
                 "AssetTypeOutput",
                 "AssetTypeLora",
-                "AssetTypeCheckpoint"
+                "AssetTypeCheckpoint",
+                "AssetTypeCover"
             ]
         },
         "github_com_comfy-creators_creator-backend_internal_domain.Attachment": {
