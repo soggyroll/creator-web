@@ -22,7 +22,6 @@ import {
   Field,
   FieldDescription,
   FieldError,
-  FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
 import { useCreateWorkflow } from "@/hooks/use-create-workflow";
@@ -120,25 +119,22 @@ function CoverUploader({ state, onChange, error }: CoverUploaderProps) {
       : undefined;
 
   const isUploading = state.status === "uploading";
+  const hasError = state.status === "error" || !!error;
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-1.5">
       <div
         className={[
-          "relative flex h-52 w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg border-2 border-dashed transition-colors",
-          isDragging
-            ? "border-primary bg-primary/5"
-            : "border-border hover:border-muted-foreground/50",
-          error || state.status === "error" ? "border-destructive" : "",
+          "relative w-full cursor-pointer overflow-hidden rounded-xl border-2 border-dashed transition-colors",
+          "aspect-video",
+          isDragging ? "border-primary bg-primary/5" : "border-border hover:border-muted-foreground/40",
+          hasError ? "border-destructive/60" : "",
           isUploading ? "cursor-default" : "",
         ]
           .filter(Boolean)
           .join(" ")}
         onClick={() => !isUploading && fileInputRef.current?.click()}
-        onDragOver={(e) => {
-          e.preventDefault();
-          if (!isUploading) setIsDragging(true);
-        }}
+        onDragOver={(e) => { e.preventDefault(); if (!isUploading) setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={onDrop}
         role="button"
@@ -152,38 +148,40 @@ function CoverUploader({ state, onChange, error }: CoverUploaderProps) {
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="flex flex-col items-center gap-2 p-6 text-center">
-            <ImageIcon className="size-8 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">
-              Drag & drop or{" "}
-              <span className="text-foreground underline underline-offset-2">
-                click to upload
-              </span>
-            </p>
-            <p className="text-xs text-muted-foreground">JPEG, PNG, WebP, GIF</p>
+          <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center">
+            <div className="rounded-lg border border-border bg-muted/50 p-3">
+              <ImageIcon className="size-5 text-muted-foreground" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-foreground">
+                Drop an image here
+              </p>
+              <p className="text-xs text-muted-foreground">
+                or{" "}
+                <span className="underline underline-offset-2">click to browse</span>
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground/70">JPEG · PNG · WebP · GIF</p>
           </div>
         )}
 
         {/* Upload progress overlay */}
         {state.status === "uploading" && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/60 px-8">
-            <UploadIcon className="size-6 text-white" />
-            <Progress value={state.progress} className="h-1.5 w-full" />
-            <p className="text-xs text-white">{state.progress}%</p>
+            <UploadIcon className="size-5 text-white" />
+            <Progress value={state.progress} className="h-1 w-full" />
+            <p className="text-xs text-white/80">{state.progress}%</p>
           </div>
         )}
 
-        {/* Change / retry overlay (visible on hover when done or error) */}
+        {/* Change / retry overlay on hover */}
         {(state.status === "done" || state.status === "error") && (
           <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity hover:opacity-100">
             <Button
               type="button"
               size="sm"
               variant="secondary"
-              onClick={(e) => {
-                e.stopPropagation();
-                fileInputRef.current?.click();
-              }}
+              onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
             >
               {state.status === "error" ? "Retry" : "Change"}
             </Button>
@@ -191,10 +189,7 @@ function CoverUploader({ state, onChange, error }: CoverUploaderProps) {
               type="button"
               size="sm"
               variant="secondary"
-              onClick={(e) => {
-                e.stopPropagation();
-                onChange({ status: "idle" });
-              }}
+              onClick={(e) => { e.stopPropagation(); onChange({ status: "idle" }); }}
             >
               <XIcon className="size-3.5" />
             </Button>
@@ -203,10 +198,10 @@ function CoverUploader({ state, onChange, error }: CoverUploaderProps) {
       </div>
 
       {state.status === "error" && (
-        <p className="text-sm text-destructive">{state.message}</p>
+        <p className="text-xs text-destructive">{state.message}</p>
       )}
       {error && state.status !== "error" && (
-        <p className="text-sm text-destructive">{error}</p>
+        <p className="text-xs text-destructive">{error}</p>
       )}
 
       <input
@@ -216,6 +211,19 @@ function CoverUploader({ state, onChange, error }: CoverUploaderProps) {
         className="hidden"
         onChange={onInputChange}
       />
+    </div>
+  );
+}
+
+// ---- Section header --------------------------------------------------------
+
+function SectionHeader({ title, description }: { title: string; description: string }) {
+  return (
+    <div className="mb-5">
+      <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+        {title}
+      </h2>
+      <p className="mt-0.5 text-xs text-muted-foreground/70">{description}</p>
     </div>
   );
 }
@@ -315,62 +323,63 @@ export function CreateWorkflowForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-10">
-      {/* Basic Info */}
-      <section className="flex flex-col gap-4">
-        <div>
-          <h2 className="text-base font-semibold">Basic info</h2>
-          <p className="text-sm text-muted-foreground">
-            General details shown on the workflow card.
-          </p>
-        </div>
-        <FieldGroup>
-          <Field>
-            <FieldLabel htmlFor="name">Name</FieldLabel>
-            <Input
-              id="name"
-              placeholder="My ComfyUI Workflow"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            {errors.name && <FieldError>{errors.name}</FieldError>}
-          </Field>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-12">
 
-          <Field>
-            <FieldLabel htmlFor="description">Description</FieldLabel>
-            <Textarea
-              id="description"
-              placeholder="Describe what this workflow does…"
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-            {errors.description && <FieldError>{errors.description}</FieldError>}
-          </Field>
+      {/* ── Basic info ───────────────────────────────────────────── */}
+      <section>
+        <SectionHeader
+          title="Basic info"
+          description="General details shown on the workflow card."
+        />
+        <div className="grid grid-cols-1 gap-x-10 gap-y-6 lg:grid-cols-[1fr_280px]">
+          {/* Left: name + description */}
+          <div className="flex flex-col gap-5">
+            <Field>
+              <FieldLabel htmlFor="name">Name</FieldLabel>
+              <Input
+                id="name"
+                placeholder="My ComfyUI Workflow"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              {errors.name && <FieldError>{errors.name}</FieldError>}
+            </Field>
 
-          <Field>
+            <Field>
+              <FieldLabel htmlFor="description">Description</FieldLabel>
+              <Textarea
+                id="description"
+                placeholder="Describe what this workflow does…"
+                rows={5}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+              {errors.description && <FieldError>{errors.description}</FieldError>}
+            </Field>
+          </div>
+
+          {/* Right: cover image */}
+          <div className="flex flex-col gap-1.5">
             <FieldLabel>Cover image</FieldLabel>
             <FieldDescription>
-              Shown on the workflow card. JPEG, PNG, WebP, or GIF.
+              Shown on the workflow card. 16:9 recommended.
             </FieldDescription>
             <CoverUploader
               state={coverUpload}
               onChange={setCoverUpload}
               error={errors.cover_url}
             />
-          </Field>
-        </FieldGroup>
+          </div>
+        </div>
       </section>
 
-      {/* Settings */}
-      <section className="flex flex-col gap-4">
-        <div>
-          <h2 className="text-base font-semibold">Settings</h2>
-          <p className="text-sm text-muted-foreground">
-            Visibility, performance, and credit configuration.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      {/* ── Settings ─────────────────────────────────────────────── */}
+      <section>
+        <SectionHeader
+          title="Settings"
+          description="Visibility, performance, and credit configuration."
+        />
+        <div className="grid grid-cols-2 gap-5 lg:grid-cols-3">
           <Field>
             <FieldLabel htmlFor="is_public">Visibility</FieldLabel>
             <Select value={isPublic} onValueChange={setIsPublic}>
@@ -442,19 +451,17 @@ export function CreateWorkflowForm() {
         </div>
       </section>
 
-      {/* Technical Config */}
-      <section className="flex flex-col gap-4">
-        <div>
-          <h2 className="text-base font-semibold">Technical configuration</h2>
-          <p className="text-sm text-muted-foreground">
-            Paste JSON exported from ComfyUI and define parameterizable nodes.
-          </p>
-        </div>
-        <FieldGroup>
+      {/* ── Technical config ─────────────────────────────────────── */}
+      <section>
+        <SectionHeader
+          title="Technical configuration"
+          description="Paste JSON exported from ComfyUI and define parameterizable nodes."
+        />
+        <div className="flex flex-col gap-6">
           <Field>
             <FieldLabel htmlFor="comfy_workflow">ComfyUI workflow JSON</FieldLabel>
             <FieldDescription>
-              Export your workflow from ComfyUI (Save → API format) and paste the JSON here.
+              Export from ComfyUI via Save → API format, then paste here.
             </FieldDescription>
             <Textarea
               id="comfy_workflow"
@@ -467,42 +474,45 @@ export function CreateWorkflowForm() {
             {errors.comfy_workflow && <FieldError>{errors.comfy_workflow}</FieldError>}
           </Field>
 
-          <Field>
-            <FieldLabel htmlFor="model_files">Model files</FieldLabel>
-            <FieldDescription>
-              JSON array of model file descriptors required by this workflow.
-            </FieldDescription>
-            <Textarea
-              id="model_files"
-              placeholder="[]"
-              rows={5}
-              className="font-mono text-xs"
-              value={modelFilesJson}
-              onChange={(e) => setModelFilesJson(e.target.value)}
-            />
-            {errors.model_files && <FieldError>{errors.model_files}</FieldError>}
-          </Field>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <Field>
+              <FieldLabel htmlFor="model_files">Model files</FieldLabel>
+              <FieldDescription>
+                JSON array of model file descriptors required by this workflow.
+              </FieldDescription>
+              <Textarea
+                id="model_files"
+                placeholder="[]"
+                rows={6}
+                className="font-mono text-xs"
+                value={modelFilesJson}
+                onChange={(e) => setModelFilesJson(e.target.value)}
+              />
+              {errors.model_files && <FieldError>{errors.model_files}</FieldError>}
+            </Field>
 
-          <Field>
-            <FieldLabel htmlFor="replaceable_nodes">Replaceable nodes</FieldLabel>
-            <FieldDescription>
-              JSON array of nodes users can parameterize when running this workflow.
-            </FieldDescription>
-            <Textarea
-              id="replaceable_nodes"
-              placeholder="[]"
-              rows={5}
-              className="font-mono text-xs"
-              value={replaceableNodesJson}
-              onChange={(e) => setReplaceableNodesJson(e.target.value)}
-            />
-            {errors.replaceable_nodes && (
-              <FieldError>{errors.replaceable_nodes}</FieldError>
-            )}
-          </Field>
-        </FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="replaceable_nodes">Replaceable nodes</FieldLabel>
+              <FieldDescription>
+                JSON array of nodes users can parameterize at run time.
+              </FieldDescription>
+              <Textarea
+                id="replaceable_nodes"
+                placeholder="[]"
+                rows={6}
+                className="font-mono text-xs"
+                value={replaceableNodesJson}
+                onChange={(e) => setReplaceableNodesJson(e.target.value)}
+              />
+              {errors.replaceable_nodes && (
+                <FieldError>{errors.replaceable_nodes}</FieldError>
+              )}
+            </Field>
+          </div>
+        </div>
       </section>
 
+      {/* ── Actions ──────────────────────────────────────────────── */}
       <div className="flex items-center justify-end gap-3 border-t border-border pt-6">
         <Button
           type="button"

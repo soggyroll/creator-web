@@ -1,11 +1,16 @@
 /** @format */
 
-// src/types/api/teams.ts
+export type TeamFeature = "workflow_creation";
+
+export type TeamRole = "OWNER" | "ADMIN" | "MEMBER";
+
+export type MemberStatus = "ACTIVE" | "LEFT" | "REMOVED" | "INVITED";
 
 export interface Team {
   archived_at?: string;
   created_at?: string;
   created_by_user_id?: string;
+  features: TeamFeature[];
   id: string;
   name: string;
   slug?: string;
@@ -16,12 +21,13 @@ export interface TeamWithMembership {
   archived_at?: string;
   created_at?: string;
   created_by_user_id?: string;
+  features: TeamFeature[];
   id: string;
   joined_at?: string;
   name: string;
-  role?: string;
+  role?: TeamRole;
   slug?: string;
-  status?: string;
+  status?: MemberStatus;
   updated_at?: string;
 }
 
@@ -32,9 +38,24 @@ export interface TeamMember {
   joined_at?: string;
   left_at?: string;
   removed_by_user_id?: string;
-  role?: string;
-  status?: string;
+  role?: TeamRole;
+  status?: MemberStatus;
   team_id?: string;
   updated_at?: string;
   user_id?: string;
 }
+
+export interface UpdateTeamRequest {
+  name?: string;
+  slug?: string;
+}
+
+export interface UpdateMemberRoleRequest {
+  role: TeamRole;
+}
+
+export interface GrantFeatureRequest {
+  feature: TeamFeature;
+}
+
+export type TeamFeaturesResponse = Record<string, TeamFeature[]>;

@@ -4,7 +4,7 @@ import { CreateWorkflowForm } from "@/components/workflows/create-workflow-form"
 
 export default function CreateWorkflowPage() {
   return (
-    <div className="mx-[12%] flex flex-col gap-8 py-10">
+    <div className="mx-auto w-full max-w-4xl flex flex-col gap-8 py-10 px-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">
           Create workflow
