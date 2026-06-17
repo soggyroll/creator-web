@@ -1,13 +1,21 @@
 /** @format */
 
-export interface Attachment {
-  type?: string;
-  url?: string;
-}
+import { Attachment } from "../entities/generation";
 
-export type FaultSource = string;
+export type FaultSource = "user" | "platform";
 export type BatchPriority = "urgent" | "standard" | "patient";
-export type GenerationStatus = string;
+export type BatchStatus =
+  | "pending"
+  | "running"
+  | "completed"
+  | "partial_failure"
+  | "failed";
+export type GenerationStatus =
+  | "queued"
+  | "running"
+  | "completed"
+  | "failed"
+  | "retrying";
 
 export interface WorkflowInputs {
   asset_ids?: Record<string, string>;
@@ -81,3 +89,5 @@ export interface GenerateResponse {
   generation_ids: string[];
   status: string;
 }
+
+/** Raw domain Generation returned from GET /batches/{id}/generations */

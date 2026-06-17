@@ -10,6 +10,11 @@ export const apiClient = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL + VERSION_PREFIX,
 });
 
+/** No-auth client for public endpoints (e.g. GET /invites/:token) */
+export const publicApiClient = Axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL + VERSION_PREFIX,
+});
+
 apiClient.interceptors.request.use(async (config) => {
   config.headers.Authorization = `Bearer ${await getToken()}`;
   const teamId = await getTeamCookie();

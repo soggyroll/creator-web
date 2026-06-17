@@ -72,7 +72,7 @@ export default function BillingPage() {
               </div>
             ))}
           </div>
-        ) : !transactions?.data.length ? (
+        ) : !transactions?.data?.length ? (
           <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-20 text-center">
             <CoinsIcon className="size-10 opacity-30" />
             <div>

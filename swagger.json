@@ -1681,6 +1681,87 @@
                 }
             }
         },
+        "/api/v1/invites/{token}": {
+            "get": {
+                "description": "Returns team name and inviter for the given invite token. No auth required.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "invites"
+                ],
+                "summary": "Get invite info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Invite token",
+                        "name": "token",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.TeamInviteView"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/invites/{token}/accept": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Joins the team associated with the invite token. User must be authenticated.",
+                "tags": [
+                    "invites"
+                ],
+                "summary": "Accept invite",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Invite token",
+                        "name": "token",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/me": {
             "get": {
                 "security": [
@@ -2038,6 +2119,157 @@
                 }
             }
         },
+        "/api/v1/teams/{id}/invites": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns active invite links for the team. Requires OWNER or ADMIN.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "invites"
+                ],
+                "summary": "List invites",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Team ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.TeamInvite"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Generates an invite link. Requires OWNER or ADMIN.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "invites"
+                ],
+                "summary": "Create invite",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Team ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "expires_in_days (default 7), max_uses (omit for unlimited)",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.TeamInvite"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/teams/{id}/invites/{token}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Revokes an active invite before its expiry. Requires OWNER or ADMIN.",
+                "tags": [
+                    "invites"
+                ],
+                "summary": "Revoke invite",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Team ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Invite token",
+                        "name": "token",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/teams/{id}/leave": {
             "post": {
                 "security": [
@@ -2343,6 +2575,67 @@
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/teams/{id}/transfer-ownership": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Promotes toUserID to OWNER and demotes the caller to MEMBER in one transaction. Caller must be OWNER.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "teams"
+                ],
+                "summary": "Transfer team ownership",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Team ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "user_id of the new owner",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.ErrorResponse"
                         }
@@ -4222,10 +4515,16 @@
                 "archived_at": {
                     "type": "string"
                 },
+                "avatar_url": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },
                 "created_by_user_id": {
+                    "type": "string"
+                },
+                "description": {
                     "type": "string"
                 },
                 "features": {
@@ -4260,6 +4559,97 @@
                 "FeatureWorkflowCreation"
             ]
         },
+        "github_com_comfy-creators_creator-backend_internal_domain.TeamInvite": {
+            "type": "object",
+            "required": [
+                "created_at",
+                "created_by_user_id",
+                "expires_at",
+                "id",
+                "status",
+                "team_id",
+                "token",
+                "updated_at",
+                "use_count"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by_user_id": {
+                    "type": "string"
+                },
+                "expires_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "max_uses": {
+                    "type": "integer"
+                },
+                "status": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.TeamInviteStatus"
+                },
+                "team_id": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "use_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.TeamInviteStatus": {
+            "type": "string",
+            "enum": [
+                "active",
+                "revoked"
+            ],
+            "x-enum-varnames": [
+                "TeamInviteStatusActive",
+                "TeamInviteStatusRevoked"
+            ]
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.TeamInviteView": {
+            "type": "object",
+            "required": [
+                "expires_at",
+                "inviter_name",
+                "status",
+                "team_id",
+                "team_name",
+                "token"
+            ],
+            "properties": {
+                "expires_at": {
+                    "type": "string"
+                },
+                "inviter_name": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.TeamInviteStatus"
+                },
+                "team_avatar_url": {
+                    "type": "string"
+                },
+                "team_id": {
+                    "type": "string"
+                },
+                "team_name": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_comfy-creators_creator-backend_internal_domain.TeamMember": {
             "type": "object",
             "required": [
@@ -4279,6 +4669,9 @@
                     "type": "string"
                 },
                 "invited_by_user_id": {
+                    "type": "string"
+                },
+                "invited_via_token": {
                     "type": "string"
                 },
                 "joined_at": {
@@ -4368,10 +4761,16 @@
                 "archived_at": {
                     "type": "string"
                 },
+                "avatar_url": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },
                 "created_by_user_id": {
+                    "type": "string"
+                },
+                "description": {
                     "type": "string"
                 },
                 "features": {
