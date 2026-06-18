@@ -1,14 +1,6 @@
 /** @format */
 
-export interface GenerateFormValues {
-  prompt: string;
-  negativePrompt: string;
-  imageSizePreset: string;
-  inferenceSteps: number;
-  guidanceScale: number;
-  seed: string;
-  numImages: number;
-}
+import type { ReplaceableNode } from "@/types/entities";
 
 export type MediaInputKind = "image" | "video" | "media";
 
@@ -21,11 +13,7 @@ export interface WorkflowMediaInput {
   accept: string[];
 }
 
-export type MediaInputStatus =
-  | "idle"
-  | "uploading"
-  | "uploaded"
-  | "failed";
+export type MediaInputStatus = "idle" | "uploading" | "uploaded" | "failed";
 
 export interface DraftMediaInput {
   uploadId?: string;
@@ -40,43 +28,81 @@ export interface DraftMediaInput {
   error?: string;
 }
 
-export const DEFAULT_FORM_VALUES: GenerateFormValues = {
-  prompt: "",
-  negativePrompt: "",
-  imageSizePreset: "square_hd",
-  inferenceSteps: 8,
-  guidanceScale: 1,
-  seed: "",
-  numImages: 1,
-};
+export type WorkflowField =
+  | { kind: "media"; nodeId: string; title: string; accept: string[] }
+  | {
+      kind: "text";
+      nodeId: string;
+      title: string;
+      multiline: boolean;
+      defaultValue: string;
+    }
+  | { kind: "int"; nodeId: string; title: string; defaultValue: number }
+  | { kind: "float"; nodeId: string; title: string; defaultValue: number };
 
-export const IMAGE_SIZE_PRESETS = [
-  { label: "Square", value: "square", width: 512, height: 512 },
-  { label: "Square HD", value: "square_hd", width: 1024, height: 1024 },
-  { label: "Portrait 3:4", value: "portrait_3_4", width: 768, height: 1024 },
-  { label: "Portrait 9:16", value: "portrait_9_16", width: 576, height: 1024 },
-  { label: "Landscape 4:3", value: "landscape_4_3", width: 1024, height: 768 },
-  {
-    label: "Landscape 16:9",
-    value: "landscape_16_9",
-    width: 1024,
-    height: 576,
-  },
-] as const;
+export type PrimitiveWorkflowField = Extract<
+  WorkflowField,
+  { kind: "text" | "int" | "float" }
+>;
 
-export const WORKFLOW_MEDIA_INPUTS: WorkflowMediaInput[] = [
-  {
-    id: "reference_media",
-    label: "Reference media",
-    description: "Image or video input for this workflow",
+export function normalizeNodes(nodes: ReplaceableNode[]): WorkflowField[] {
+  return nodes
+    .filter((node) => !Array.isArray(node.current_value))
+    .map((node): WorkflowField => {
+      if (node.input_kind === "media") {
+        return {
+          kind: "media",
+          nodeId: node.node_id,
+          title: node.title,
+          accept:
+            node.value_type === "image"
+              ? ["image/png", "image/jpeg", "image/webp"]
+              : [
+                  "image/png",
+                  "image/jpeg",
+                  "image/webp",
+                  "video/mp4",
+                  "video/webm",
+                  "video/quicktime",
+                ],
+        };
+      }
+      if (node.value_type === "int") {
+        return {
+          kind: "int",
+          nodeId: node.node_id,
+          title: node.title,
+          defaultValue:
+            typeof node.current_value === "number" ? node.current_value : 0,
+        };
+      }
+      if (node.value_type === "float") {
+        return {
+          kind: "float",
+          nodeId: node.node_id,
+          title: node.title,
+          defaultValue:
+            typeof node.current_value === "number" ? node.current_value : 0,
+        };
+      }
+      return {
+        kind: "text",
+        nodeId: node.node_id,
+        title: node.title,
+        multiline: node.class_type === "PrimitiveStringMultiline",
+        defaultValue:
+          typeof node.current_value === "string" ? node.current_value : "",
+      };
+    });
+}
+
+export function fieldToMediaInput(
+  field: Extract<WorkflowField, { kind: "media" }>,
+): WorkflowMediaInput {
+  return {
+    id: field.nodeId,
+    label: field.title,
     kind: "media",
-    accept: [
-      "image/png",
-      "image/jpeg",
-      "image/webp",
-      "video/mp4",
-      "video/webm",
-      "video/quicktime",
-    ],
-  },
-];
+    accept: field.accept,
+  };
+}

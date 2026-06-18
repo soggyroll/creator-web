@@ -17,17 +17,9 @@ export type GenerationStatus =
   | "failed"
   | "retrying";
 
-export interface WorkflowInputs {
-  asset_ids?: Record<string, string>;
-  image_urls: Record<string, string>;
-  primitive_inputs: Record<string, unknown>;
-}
+export type WorkflowInputs = Record<string, unknown>;
 
-export interface WorkflowInputsBody {
-  asset_ids: Record<string, string>;
-  image_urls: Record<string, string>;
-  primitive_inputs: Record<string, unknown>;
-}
+export type WorkflowInputsBody = Record<string, unknown>;
 
 export interface GenerationUserRef {
   avatar_url?: string;
@@ -75,7 +67,6 @@ export interface ListGenerationResponse {
 
 export interface GenerationInput {
   inputs: WorkflowInputsBody;
-  prompt: string;
   workflow_id: string;
 }
 

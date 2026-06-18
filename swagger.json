@@ -3226,15 +3226,11 @@
             "type": "object",
             "required": [
                 "inputs",
-                "prompt",
                 "workflow_id"
             ],
             "properties": {
                 "inputs": {
-                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.WorkflowInputs"
-                },
-                "prompt": {
-                    "type": "string"
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_api_dto.WorkflowInputsBody"
                 },
                 "workflow_id": {
                     "type": "string"
@@ -3419,6 +3415,32 @@
                 }
             }
         },
+        "github_com_comfy-creators_creator-backend_internal_api_dto.WorkflowInputsBody": {
+            "type": "object",
+            "required": [
+                "asset_ids",
+                "image_urls",
+                "primitive_inputs"
+            ],
+            "properties": {
+                "asset_ids": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "image_urls": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "primitive_inputs": {
+                    "type": "object",
+                    "additionalProperties": {}
+                }
+            }
+        },
         "github_com_comfy-creators_creator-backend_internal_api_dto.WorkflowResponse": {
             "type": "object",
             "required": [
@@ -3437,7 +3459,7 @@
             ],
             "properties": {
                 "workflow": {
-                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.WorkflowView"
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.WorkflowDetailView"
                 }
             }
         },
@@ -4907,6 +4929,66 @@
                 },
                 "user_id": {
                     "type": "string"
+                }
+            }
+        },
+        "github_com_comfy-creators_creator-backend_internal_domain.WorkflowDetailView": {
+            "type": "object",
+            "required": [
+                "avg_time",
+                "cost",
+                "created_at",
+                "id",
+                "name",
+                "replaceable_nodes",
+                "stats",
+                "team",
+                "updated_at",
+                "user",
+                "viewer"
+            ],
+            "properties": {
+                "avg_time": {
+                    "type": "integer"
+                },
+                "cost": {
+                    "type": "integer"
+                },
+                "cover_url": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "replaceable_nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.ReplaceableNode"
+                    }
+                },
+                "stats": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.WorkflowStats"
+                },
+                "team": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.WorkflowTeamRef"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.WorkflowUserRef"
+                },
+                "viewer": {
+                    "$ref": "#/definitions/github_com_comfy-creators_creator-backend_internal_domain.WorkflowViewer"
                 }
             }
         },
