@@ -1,15 +1,15 @@
 /** @format */
 
-import { ReplaceableNode, Workflow, WorkflowFull } from "../entities";
+import { ReplaceableNode, Workflow, WorkflowDetailView, WorkflowFull } from "../entities";
 
 /** Wraps WorkflowFull — returned from POST /workflows and PATCH /workflows/{id} */
 export interface WorkflowResponse {
   workflow: WorkflowFull;
 }
 
-/** Wraps enriched WorkflowView — returned from GET /workflows/{id} */
+/** Wraps enriched WorkflowDetailView — returned from GET /workflows/{id} */
 export interface WorkflowViewResponse {
-  workflow: Workflow;
+  workflow: WorkflowDetailView;
 }
 
 /** Offset-paginated list of enriched workflow views — returned from GET /workflows */

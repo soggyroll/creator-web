@@ -1,5 +1,7 @@
 /** @format */
 
+export type ValueType = "string" | "float" | "int";
+
 export interface ReplaceableNode {
   class_type: string;
   current_value: unknown;
@@ -10,7 +12,7 @@ export interface ReplaceableNode {
   value_type: string;
 }
 
-/** Enriched view returned from GET /workflows and GET /workflows/{id} */
+/** Enriched list view returned from GET /workflows and GET /my/workflows — no replaceable_nodes */
 export interface Workflow {
   avg_time: number;
   cost: number;
@@ -24,6 +26,11 @@ export interface Workflow {
   updated_at: string;
   user: WorkflowUserRef;
   viewer: WorkflowViewer;
+}
+
+/** Enriched detail view returned from GET /workflows/{id} — includes replaceable_nodes */
+export interface WorkflowDetailView extends Workflow {
+  replaceable_nodes: ReplaceableNode[];
 }
 
 /** Full domain object returned from POST /workflows and PATCH /workflows/{id} */

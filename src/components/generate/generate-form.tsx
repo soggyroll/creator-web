@@ -5,10 +5,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
-import { ChevronDownIcon, RefreshCwIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { useCreateGeneration } from "@/hooks/use-create-generation";
+import { useWorkflow } from "@/hooks/use-workflow";
 import { api } from "@/lib/api";
 import { uploadFileToS3 } from "@/lib/upload";
 
@@ -19,28 +19,18 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Textarea } from "@/components/ui/textarea";
 
 import { BatchRail } from "./batch-rail";
 import { MediaInputCard } from "./media-input-card";
 import { MediaPreviewDrawer } from "./media-preview-drawer";
 import {
-  DEFAULT_FORM_VALUES,
-  IMAGE_SIZE_PRESETS,
-  WORKFLOW_MEDIA_INPUTS,
+  fieldToMediaInput,
+  normalizeNodes,
   type DraftMediaInput,
-  type GenerateFormValues,
+  type WorkflowField,
   type WorkflowMediaInput,
 } from "./types";
+import { WorkflowFieldInput } from "./workflow-field-input";
 
 interface GenerateFormProps {
   workflowId: string;
@@ -50,16 +40,18 @@ type BatchPriority = "urgent" | "standard" | "patient";
 
 interface BatchDraft {
   id: string;
-  values: GenerateFormValues;
+  primitiveInputs: Record<string, string | number>;
   mediaInputs: Record<string, DraftMediaInput>;
 }
 
-function createDraft(id: string, values = DEFAULT_FORM_VALUES): BatchDraft {
-  return {
-    id,
-    values: { ...values },
-    mediaInputs: {},
-  };
+function createDraft(id: string, fields: WorkflowField[]): BatchDraft {
+  const primitiveInputs: Record<string, string | number> = {};
+  fields.forEach((field) => {
+    if (field.kind !== "media") {
+      primitiveInputs[field.nodeId] = field.defaultValue;
+    }
+  });
+  return { id, primitiveInputs, mediaInputs: {} };
 }
 
 function createUploadId() {
@@ -72,35 +64,91 @@ function getFirstMediaInput(draft: BatchDraft) {
   return Object.values(draft.mediaInputs)[0] ?? null;
 }
 
-function buildWorkflowInputs(mediaInputs: Record<string, DraftMediaInput>) {
-  const asset_ids: Record<string, string> = {};
-
-  Object.values(mediaInputs).forEach((media) => {
-    if (!media.assetId || media.status !== "uploaded") return;
-
-    asset_ids[media.inputId] = media.assetId;
-  });
-
-  return {
-    asset_ids,
-    image_urls: {},
-    primitive_inputs: {},
-  };
+function getDraftLabel(
+  draft: BatchDraft,
+  fields: WorkflowField[],
+): string {
+  const firstTextField = fields.find((f) => f.kind === "text");
+  if (!firstTextField) return "";
+  const value = draft.primitiveInputs[firstTextField.nodeId];
+  return typeof value === "string" ? value : "";
 }
 
+function buildWorkflowInputs(
+  mediaInputs: Record<string, DraftMediaInput>,
+  primitiveInputs: Record<string, string | number>,
+): Record<string, unknown> {
+  const inputs: Record<string, unknown> = { ...primitiveInputs };
+  Object.values(mediaInputs).forEach((media) => {
+    if (!media.assetId || media.status !== "uploaded") return;
+    inputs[media.inputId] = { asset_id: media.assetId };
+  });
+  return inputs;
+}
 
 export default function GenerateForm({ workflowId }: GenerateFormProps) {
   const router = useRouter();
   const { isSignedIn } = useAuth();
-  const [showAdditional, setShowAdditional] = useState(false);
   const [priority, setPriority] = useState<BatchPriority>("standard");
   const nextDraftNumber = useRef(2);
-  const [drafts, setDrafts] = useState<BatchDraft[]>([createDraft("draft-1")]);
+  const [drafts, setDrafts] = useState<BatchDraft[]>([
+    { id: "draft-1", primitiveInputs: {}, mediaInputs: {} },
+  ]);
   const [activeDraftId, setActiveDraftId] = useState("draft-1");
-  const [selectedMediaInputId, setSelectedMediaInputId] = useState(
-    WORKFLOW_MEDIA_INPUTS[0]?.id ?? "",
-  );
+  const [selectedMediaInputId, setSelectedMediaInputId] = useState("");
   const [isMediaPreviewOpen, setIsMediaPreviewOpen] = useState(false);
+
+  const { data } = useWorkflow(workflowId);
+  const workflow = data?.workflow;
+
+  const fields = useMemo(
+    () => normalizeNodes(workflow?.replaceable_nodes ?? []),
+    [workflow?.replaceable_nodes],
+  );
+
+  const mediaFields = useMemo(
+    () =>
+      fields.filter(
+        (f): f is Extract<WorkflowField, { kind: "media" }> =>
+          f.kind === "media",
+      ),
+    [fields],
+  );
+
+  const primitiveFields = useMemo(
+    () =>
+      fields.filter(
+        (
+          f,
+        ): f is Extract<WorkflowField, { kind: "text" | "int" | "float" }> =>
+          f.kind !== "media",
+      ),
+    [fields],
+  );
+
+  // Populate primitive defaults once fields arrive
+  useEffect(() => {
+    if (!fields.length) return;
+    setDrafts((current) =>
+      current.map((draft) => {
+        if (Object.keys(draft.primitiveInputs).length > 0) return draft;
+        const primitiveInputs: Record<string, string | number> = {};
+        fields.forEach((field) => {
+          if (field.kind !== "media") {
+            primitiveInputs[field.nodeId] = field.defaultValue;
+          }
+        });
+        return { ...draft, primitiveInputs };
+      }),
+    );
+  }, [fields]);
+
+  // Select first media field once available
+  useEffect(() => {
+    if (mediaFields.length > 0 && !selectedMediaInputId) {
+      setSelectedMediaInputId(mediaFields[0].nodeId);
+    }
+  }, [mediaFields, selectedMediaInputId]);
 
   const {
     mutate: createGenerationBatch,
@@ -113,15 +161,12 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
     [activeDraftId, drafts],
   );
   const activeIndex = drafts.findIndex((draft) => draft.id === activeDraft.id);
-  const readyDrafts = drafts.filter(
-    (draft) => draft.values.prompt.trim().length > 0,
-  );
+
   const allMedia = drafts.flatMap((draft) => Object.values(draft.mediaInputs));
   const hasUploadingMedia = allMedia.some(
     (media) => media.status === "uploading",
   );
   const hasFailedMedia = allMedia.some((media) => media.status === "failed");
-  const isBatchReady = readyDrafts.length === drafts.length;
 
   useEffect(() => {
     if (error) {
@@ -137,11 +182,14 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
     return id;
   }
 
-  function updateActiveValues(patch: Partial<GenerateFormValues>) {
+  function updatePrimitiveInput(nodeId: string, value: string | number) {
     setDrafts((current) =>
       current.map((draft) =>
         draft.id === activeDraft.id
-          ? { ...draft, values: { ...draft.values, ...patch } }
+          ? {
+              ...draft,
+              primitiveInputs: { ...draft.primitiveInputs, [nodeId]: value },
+            }
           : draft,
       ),
     );
@@ -179,10 +227,8 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
     setDrafts((current) =>
       current.map((draft) => {
         if (draft.id !== draftId) return draft;
-
         const currentMedia = draft.mediaInputs[inputId];
         if (!currentMedia || currentMedia.uploadId !== uploadId) return draft;
-
         return {
           ...draft,
           mediaInputs: {
@@ -235,10 +281,9 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
       });
 
       toast.success(`${file.name} uploaded.`);
-    } catch (error) {
+    } catch (err) {
       const message =
-        error instanceof Error ? error.message : "Upload failed. Try again.";
-
+        err instanceof Error ? err.message : "Upload failed. Try again.";
       patchDraftMediaInput(draftId, input.id, uploadId, {
         progress: 0,
         status: "failed",
@@ -255,7 +300,6 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
   ) {
     const previous = activeDraft.mediaInputs[input.id];
     if (previous?.previewUrl) URL.revokeObjectURL(previous.previewUrl);
-
     updateDraftMediaInput(activeDraft.id, input.id, {
       inputId: input.id,
       fileName: file.name,
@@ -276,7 +320,7 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
 
   function addDraft() {
     const id = makeDraftId();
-    setDrafts((current) => [...current, createDraft(id)]);
+    setDrafts((current) => [...current, createDraft(id, fields)]);
     setActiveDraftId(id);
   }
 
@@ -285,9 +329,9 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
     if (!source) return;
 
     const duplicateId = makeDraftId();
-    const duplicate = {
+    const duplicate: BatchDraft = {
       id: duplicateId,
-      values: { ...source.values },
+      primitiveInputs: { ...source.primitiveInputs },
       mediaInputs: {},
     };
 
@@ -302,12 +346,10 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
 
   function removeDraft(id: string) {
     if (drafts.length === 1) return;
-
     const draft = drafts.find((item) => item.id === id);
     Object.values(draft?.mediaInputs ?? {}).forEach((media) => {
       if (media.previewUrl) URL.revokeObjectURL(media.previewUrl);
     });
-
     setDrafts((current) => current.filter((item) => item.id !== id));
     if (activeDraftId === id) {
       const fallback = drafts.find((item) => item.id !== id);
@@ -322,7 +364,7 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
     setDrafts((current) =>
       current.map((draft) =>
         draft.id === activeDraft.id
-          ? createDraft(draft.id, DEFAULT_FORM_VALUES)
+          ? createDraft(draft.id, fields)
           : draft,
       ),
     );
@@ -337,11 +379,6 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
       return;
     }
 
-    if (!isBatchReady) {
-      toast.error("Every batch item needs a prompt before running.");
-      return;
-    }
-
     if (hasUploadingMedia) {
       toast.error("Wait for media uploads to finish before running.");
       return;
@@ -353,16 +390,12 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
     }
 
     const generations = drafts.map((draft) => ({
-      prompt: draft.values.prompt.trim(),
       workflow_id: workflowId,
-      inputs: buildWorkflowInputs(draft.mediaInputs),
+      inputs: buildWorkflowInputs(draft.mediaInputs, draft.primitiveInputs),
     }));
 
     createGenerationBatch(
-      {
-        generations,
-        priority,
-      },
+      { generations, priority },
       {
         onSuccess: () => {
           toast.success(
@@ -376,24 +409,18 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
     );
   }
 
-  const values = activeDraft.values;
-
-  const selectedMediaInput =
-    WORKFLOW_MEDIA_INPUTS.find((input) => input.id === selectedMediaInputId) ??
-    WORKFLOW_MEDIA_INPUTS[0];
-
+  const selectedMediaField =
+    mediaFields.find((f) => f.nodeId === selectedMediaInputId) ??
+    mediaFields[0];
+  const selectedMediaInput = selectedMediaField
+    ? fieldToMediaInput(selectedMediaField)
+    : undefined;
   const selectedMedia = selectedMediaInput
     ? activeDraft.mediaInputs[selectedMediaInput.id]
     : undefined;
 
-  const selectedPreset =
-    IMAGE_SIZE_PRESETS.find(
-      (preset) => preset.value === values.imageSizePreset,
-    ) ?? IMAGE_SIZE_PRESETS[1];
-
   const canSubmit =
-    !isSignedIn ||
-    (!isPending && isBatchReady && !hasUploadingMedia && !hasFailedMedia);
+    !isSignedIn || (!isPending && !hasUploadingMedia && !hasFailedMedia);
 
   const runLabel = !isSignedIn
     ? "Sign in to run"
@@ -431,206 +458,59 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
               </Button>
             </div>
 
-            <FieldGroup className="mb-5">
-              <Field>
-                <FieldLabel htmlFor="prompt">Prompt</FieldLabel>
-                <Textarea
-                  id="prompt"
-                  name="prompt"
-                  placeholder="A serene mountain landscape at sunset with golden light"
-                  rows={5}
-                  value={values.prompt}
-                  onChange={(e) =>
-                    updateActiveValues({ prompt: e.target.value })
-                  }
-                  autoFocus
-                />
-              </Field>
-            </FieldGroup>
-
-            <FieldGroup className="mb-5">
-              <Field>
-                <div>
-                  <FieldLabel>Workflow inputs</FieldLabel>
-                  <FieldDescription>
-                    Add media directly to the workflow slot that uses it.
-                  </FieldDescription>
-                </div>
-                <div className="flex flex-col gap-3">
-                  {WORKFLOW_MEDIA_INPUTS.map((input) => (
-                    <MediaInputCard
-                      key={input.id}
-                      input={input}
-                      media={activeDraft.mediaInputs[input.id]}
-                      selected={selectedMediaInputId === input.id}
-                      onSelect={() => setSelectedMediaInputId(input.id)}
-                      onPreview={() => setIsMediaPreviewOpen(true)}
-                      onFileSelect={(file) =>
-                        handleMediaFileSelect(input, file)
+            {primitiveFields.length > 0 && (
+              <FieldGroup className="mb-5">
+                {primitiveFields.map((field) => (
+                  <Field key={field.nodeId}>
+                    <FieldLabel>{field.title}</FieldLabel>
+                    <WorkflowFieldInput
+                      field={field}
+                      value={
+                        activeDraft.primitiveInputs[field.nodeId] ??
+                        field.defaultValue
                       }
-                      onInvalidFile={(file, errorMessage) =>
-                        handleInvalidMediaFile(input, file, errorMessage)
-                      }
-                      onClear={() => clearMediaInput(input)}
-                    />
-                  ))}
-                </div>
-              </Field>
-            </FieldGroup>
-
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowAdditional((v) => !v)}
-              className="-ml-2 mb-5 w-fit font-medium"
-            >
-              Additional Settings
-              <ChevronDownIcon
-                className={`size-4 text-muted-foreground transition-transform duration-200 ${
-                  showAdditional ? "rotate-180" : ""
-                }`}
-              />
-            </Button>
-
-            {showAdditional && (
-              <FieldGroup>
-                <Field>
-                  <FieldLabel htmlFor="negativePrompt">
-                    Negative Prompt
-                  </FieldLabel>
-                  <Textarea
-                    id="negativePrompt"
-                    name="negativePrompt"
-                    rows={3}
-                    value={values.negativePrompt}
-                    onChange={(e) =>
-                      updateActiveValues({ negativePrompt: e.target.value })
-                    }
-                  />
-                </Field>
-
-                <Field>
-                  <FieldLabel htmlFor="imageSizePreset">Image Size</FieldLabel>
-                  <div className="flex items-center gap-2">
-                    <Select
-                      name="imageSizePreset"
-                      value={values.imageSizePreset}
-                      onValueChange={(value) =>
-                        updateActiveValues({ imageSizePreset: value })
-                      }
-                    >
-                      <SelectTrigger id="imageSizePreset" className="flex-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {IMAGE_SIZE_PRESETS.map((preset) => (
-                          <SelectItem key={preset.value} value={preset.value}>
-                            {preset.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                      <span className="rounded-md border border-border/60 px-2.5 py-1.5 font-mono tabular-nums">
-                        {selectedPreset.width}
-                      </span>
-                      <span>x</span>
-                      <span className="rounded-md border border-border/60 px-2.5 py-1.5 font-mono tabular-nums">
-                        {selectedPreset.height}
-                      </span>
-                    </div>
-                  </div>
-                </Field>
-
-                <Field>
-                  <div className="flex items-center justify-between">
-                    <FieldLabel htmlFor="inferenceSteps">
-                      Num Inference Steps
-                    </FieldLabel>
-                    <span className="w-10 rounded-md border border-border/60 px-2 py-1 text-center text-sm tabular-nums">
-                      {values.inferenceSteps}
-                    </span>
-                  </div>
-                  <Slider
-                    id="inferenceSteps"
-                    min={1}
-                    max={50}
-                    step={1}
-                    value={[values.inferenceSteps]}
-                    onValueChange={([value]) =>
-                      updateActiveValues({ inferenceSteps: value })
-                    }
-                  />
-                </Field>
-
-                <Field>
-                  <div className="flex items-center justify-between">
-                    <FieldLabel htmlFor="guidanceScale">
-                      Guidance Scale
-                    </FieldLabel>
-                    <span className="w-10 rounded-md border border-border/60 px-2 py-1 text-center text-sm tabular-nums">
-                      {values.guidanceScale}
-                    </span>
-                  </div>
-                  <Slider
-                    id="guidanceScale"
-                    min={0}
-                    max={20}
-                    step={0.1}
-                    value={[values.guidanceScale]}
-                    onValueChange={([value]) =>
-                      updateActiveValues({ guidanceScale: value })
-                    }
-                  />
-                </Field>
-
-                <Field>
-                  <FieldLabel htmlFor="seed">Seed</FieldLabel>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      id="seed"
-                      name="seed"
-                      type="number"
-                      placeholder="random"
-                      value={values.seed}
-                      onChange={(e) =>
-                        updateActiveValues({ seed: e.target.value })
+                      onChange={(value) =>
+                        updatePrimitiveInput(field.nodeId, value)
                       }
                     />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon-sm"
-                      onClick={() =>
-                        updateActiveValues({
-                          seed: String(Math.floor(Math.random() * 2 ** 32)),
-                        })
-                      }
-                      title="Randomize seed"
-                    >
-                      <RefreshCwIcon />
-                    </Button>
-                  </div>
-                </Field>
+                  </Field>
+                ))}
+              </FieldGroup>
+            )}
 
+            {mediaFields.length > 0 && (
+              <FieldGroup className="mb-5">
                 <Field>
-                  <div className="flex items-center justify-between">
-                    <FieldLabel htmlFor="numImages">Num Images</FieldLabel>
-                    <span className="w-10 rounded-md border border-border/60 px-2 py-1 text-center text-sm tabular-nums">
-                      {values.numImages}
-                    </span>
+                  <div>
+                    <FieldLabel>Workflow inputs</FieldLabel>
+                    <FieldDescription>
+                      Add media directly to the workflow slot that uses it.
+                    </FieldDescription>
                   </div>
-                  <Slider
-                    id="numImages"
-                    min={1}
-                    max={8}
-                    step={1}
-                    value={[values.numImages]}
-                    onValueChange={([value]) =>
-                      updateActiveValues({ numImages: value })
-                    }
-                  />
+                  <div className="flex flex-col gap-3">
+                    {mediaFields.map((mediaField) => {
+                      const input = fieldToMediaInput(mediaField);
+                      return (
+                        <MediaInputCard
+                          key={mediaField.nodeId}
+                          input={input}
+                          media={activeDraft.mediaInputs[input.id]}
+                          selected={selectedMediaInputId === mediaField.nodeId}
+                          onSelect={() =>
+                            setSelectedMediaInputId(mediaField.nodeId)
+                          }
+                          onPreview={() => setIsMediaPreviewOpen(true)}
+                          onFileSelect={(file) =>
+                            handleMediaFileSelect(input, file)
+                          }
+                          onInvalidFile={(file, errorMessage) =>
+                            handleInvalidMediaFile(input, file, errorMessage)
+                          }
+                          onClear={() => clearMediaInput(input)}
+                        />
+                      );
+                    })}
+                  </div>
                 </Field>
               </FieldGroup>
             )}
@@ -640,7 +520,7 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
         <BatchRail
           batchItems={drafts.map((draft) => ({
             id: draft.id,
-            prompt: draft.values.prompt,
+            prompt: getDraftLabel(draft, fields),
             previewUrl: getFirstMediaInput(draft)?.previewUrl ?? null,
             mediaStatus: getFirstMediaInput(draft)?.status ?? "idle",
           }))}
