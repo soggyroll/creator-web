@@ -13,11 +13,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="studio-frame">
       <a href="#main-content" className="skip-link">Skip to content</a>
-      <TeamCookieSync />
       <BrandRail href="/discover" note="More room for making" />
       <div className="studio-body">
-        <AppNav />
-        <main id="main-content" className="min-w-0">{children}</main>
+        <TeamCookieSync>
+          <AppNav />
+          <main id="main-content" className="min-w-0">{children}</main>
+        </TeamCookieSync>
       </div>
     </div>
   );

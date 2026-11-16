@@ -16,7 +16,8 @@ export const publicApiClient = Axios.create({
 });
 
 apiClient.interceptors.request.use(async (config) => {
-  config.headers.Authorization = `Bearer ${await getToken()}`;
+  const token = await getToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   const teamId = await getTeamCookie();
 
   if (teamId) {

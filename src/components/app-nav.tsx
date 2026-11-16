@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CreditCardIcon, PlusIcon } from "lucide-react";
 import { useAuth, UserButton } from "@clerk/nextjs";
+import { toast } from "sonner";
 import { useCreditBalance } from "@/hooks/use-credit-balance";
 import { useTeams } from "@/hooks/team/use-teams";
 import { useTeam } from "@/hooks/team/use-team";
@@ -21,14 +22,14 @@ const NAV_LINKS = [
 function TeamSelect() {
   const { data: teams, isLoading } = useTeams();
   const { teamId } = useTeam();
-  const { mutate: updateTeam } = useUpdateTeam();
+  const { mutate: updateTeam, isPending } = useUpdateTeam();
 
   if (isLoading) return <Skeleton className="h-9 w-28" />;
   if (!teams?.length) return null;
 
   return (
     <div className="studio-team-picker">
-      <Select value={teamId ?? undefined} onValueChange={(id) => updateTeam(id)}>
+      <Select disabled={isPending} value={teamId ?? undefined} onValueChange={(id) => updateTeam(id, { onError: () => toast.error("Couldn't switch workspaces. Please try again.") })}>
         <SelectTrigger className="w-full" aria-label="Current team"><SelectValue placeholder="Select team" /></SelectTrigger>
         <SelectContent><SelectGroup>{teams.map((team) => <SelectItem key={team.id} value={team.id!}><span className="truncate">{team.name}</span></SelectItem>)}</SelectGroup></SelectContent>
       </Select>

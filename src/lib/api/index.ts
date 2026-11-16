@@ -55,6 +55,10 @@ import { Generation } from "@/types/entities/generation";
 
 export const api = {
   user: {
+    bootstrap: async (): Promise<User> => {
+      const { data } = await apiClient.post<User>("/me/bootstrap");
+      return data;
+    },
     me: async (): Promise<User> => {
       const { data } = await apiClient.get<User>("/me");
       return data;
@@ -124,8 +128,8 @@ export const api = {
 
   teams: {
     get: async (): Promise<TeamWithMembership[]> => {
-      const { data } = await apiClient.get("/teams");
-      return data;
+      const { data } = await apiClient.get<TeamWithMembership[] | null>("/teams");
+      return data ?? [];
     },
     create: async (request: CreateTeamRequest): Promise<Team> => {
       const { data } = await apiClient.post<Team>("/teams", request);

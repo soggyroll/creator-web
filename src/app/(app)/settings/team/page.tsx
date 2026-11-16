@@ -21,8 +21,8 @@ import { useTeamInvites } from "@/hooks/team/use-team-invites";
 import { useCreateTeamInvite } from "@/hooks/team/use-create-team-invite";
 import { useRevokeTeamInvite } from "@/hooks/team/use-revoke-team-invite";
 import { TEAMS_QUERY_KEY } from "@/hooks/team/use-teams";
-import { CURRENT_TEAM_QUERY_KEY } from "@/hooks/team/use-team";
 import { setTeamCookie } from "@/actions/team";
+import { changeActiveTeam } from "@/lib/active-team";
 import type {
   TeamInvite,
   TeamMemberView,
@@ -156,10 +156,8 @@ export default function TeamSettingsPage() {
     const teams =
       queryClient.getQueryData<TeamWithMembership[]>(TEAMS_QUERY_KEY) ?? [];
     const remaining = teams.filter((t) => t.id !== teamId);
-    if (remaining.length > 0) {
-      await setTeamCookie(remaining[0].id);
-      queryClient.setQueryData(CURRENT_TEAM_QUERY_KEY, remaining[0].id);
-    }
+    queryClient.setQueryData(TEAMS_QUERY_KEY, remaining);
+    await changeActiveTeam(queryClient, remaining[0]?.id ?? null, setTeamCookie);
     queryClient.invalidateQueries({ queryKey: TEAMS_QUERY_KEY });
     router.push("/discover");
   }

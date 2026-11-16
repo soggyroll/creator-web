@@ -6,8 +6,13 @@ import { cookies } from "next/headers";
 
 const TEAM_COOKIE = "team_id";
 
-export async function setTeamCookie(teamId: string): Promise<void> {
+export async function setTeamCookie(teamId: string | null): Promise<void> {
   const cookieStore = await cookies();
+  if (teamId === null) {
+    cookieStore.delete(TEAM_COOKIE);
+    return;
+  }
+
   cookieStore.set(TEAM_COOKIE, teamId, {
     httpOnly: true,
     sameSite: "lax",
