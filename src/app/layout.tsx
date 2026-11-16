@@ -1,5 +1,5 @@
 /** @format */
-import { Bebas_Neue, Figtree, Inter } from "next/font/google";
+import { Barlow_Condensed, Figtree } from "next/font/google";
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { shadcn } from "@clerk/ui/themes";
@@ -10,12 +10,11 @@ import Providers from "@/components/providers";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 
-const interHeading = Inter({ subsets: ["latin"], variable: "--font-heading" });
-const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
-const bebasNeue = Bebas_Neue({
-  weight: "400",
+const figtree = Figtree({ subsets: ["latin"], variable: "--font-figtree", display: "swap" });
+const barlowCondensed = Barlow_Condensed({
+  weight: ["500", "600"],
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-barlow",
   display: "swap",
 });
 
@@ -26,7 +25,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://soggyroll.art"),
 
   title: {
-    default: "Soggy Roll - Generate without Pain of infrastructure",
+    default: "Soggy Roll — Make room for ideas",
     template: "%s | Soggy Roll",
   },
   description: DESCRIPTION,
@@ -91,9 +90,8 @@ export default function RootLayout({
         className={cn(
           "h-full",
           "antialiased",
-          interHeading.variable,
           figtree.variable,
-          bebasNeue.variable,
+          barlowCondensed.variable,
           "font-sans",
         )}
       >

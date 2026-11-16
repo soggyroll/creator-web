@@ -1,0 +1,108 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&amp;display=swap">
+<div id="sr-spacious">
+  <style>
+    #sr-spacious { width:100%; }
+    #sr-spacious .studio { --studio-bg:#151515; --studio-ink:#f0f0e9; --studio-muted:#b4b4ad; --studio-accent:#e8f63f; --studio-space:64px; background:var(--studio-bg); color:var(--studio-ink); font:400 16px/1.6 'Figtree',sans-serif; container-type:inline-size; }
+    #sr-spacious .studio * { box-sizing:border-box; }
+    #sr-spacious .studio h1, #sr-spacious .studio h2, #sr-spacious .studio p, #sr-spacious .studio figure { margin:0; }
+    #sr-spacious .studio a { color:inherit; text-decoration:none; }
+    #sr-spacious .studio button { font:inherit; cursor:pointer; }
+    #sr-spacious .studio a:focus-visible, #sr-spacious .studio button:focus-visible { outline:2px solid var(--studio-accent); outline-offset:6px; }
+    #sr-spacious .studio-header { padding:32px var(--studio-space); display:flex; align-items:center; gap:30px; }
+    #sr-spacious .studio-brand { font-size:24px; font-weight:700; letter-spacing:-1.2px; white-space:nowrap; }
+    #sr-spacious .studio-brand span { color:var(--studio-accent); }
+    #sr-spacious .studio-nav { display:flex; margin-left:auto; gap:32px; align-items:center; font-size:14px; }
+    #sr-spacious .studio-nav button { border:0; background:transparent; color:var(--studio-muted); padding:10px 0; font-size:14px; }
+    #sr-spacious .studio-nav a { color:var(--studio-ink); padding:10px 0; }
+    #sr-spacious .studio-hero { display:grid; grid-template-columns:1.12fr 1fr; gap:48px; align-items:center; padding:84px var(--studio-space) 110px; }
+    #sr-spacious .studio-eyebrow { color:var(--studio-muted); font-size:12px; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:28px !important; }
+    #sr-spacious .studio h1 { font-size:clamp(52px,7.7cqw,82px); line-height:1.04; letter-spacing:-4px; font-weight:500; }
+    #sr-spacious .studio h1 em { color:var(--studio-accent); font-style:normal; }
+    #sr-spacious .studio-description { color:var(--studio-muted); font-size:18px; line-height:1.7; max-width:355px; margin-top:30px !important; text-wrap:pretty; }
+    #sr-spacious .studio-action { display:inline-flex; align-items:center; justify-content:center; gap:28px; margin-top:36px; padding:15px 23px; background:var(--studio-accent); color:#17180d !important; font-weight:600; font-size:15px; border-radius:5px; min-height:52px; }
+    #sr-spacious .studio-note { font-size:13px; color:var(--studio-muted); margin-top:18px !important; }
+    #sr-spacious .studio-figure { align-self:center; min-width:0; }
+    #sr-spacious .studio-art { position:relative; min-height:410px; overflow:hidden; isolation:isolate; background:radial-gradient(ellipse at 60% 20%,#565849 0,transparent 70%),#24251f; border-radius:100px 100px 12px 12px; }
+    #sr-spacious .studio-art::before { content:''; position:absolute; inset:18% 12% 20%; border-radius:46% 54% 38% 62% / 56% 38% 62% 44%; transform:rotate(-30deg); background:conic-gradient(from 0deg,#22251e,#eef1df 12%,#7f8576 22%,#2e3329 31%,#e0e4d2 42%,#7e8570 48%,#22261b 62%,#f4f7dd 77%,#858c71 86%,#22251e); box-shadow:inset 4px 6px 10px #fff5,10px 20px 30px #0006; }
+    #sr-spacious .studio-art::after { content:''; position:absolute; inset:38% 34% 40%; border-radius:40% 60% 45% 55%; transform:rotate(-30deg); background:linear-gradient(135deg,#454b39,#72775e); box-shadow:inset 9px 8px 10px #0009,2px 2px 3px #f8ffe97a; }
+    #sr-spacious .studio-caption { margin-top:14px; text-align:right; color:var(--studio-muted); font-size:12px; }
+    #sr-spacious .studio-rule { margin:0 var(--studio-space); border-top:1px solid #ffffff1c; }
+    #sr-spacious .studio-foot { display:flex; justify-content:space-between; gap:24px; padding:27px var(--studio-space); color:var(--studio-muted); font-size:13px; }
+    #sr-spacious .studio-details { margin:0 var(--studio-space); padding:36px 0 45px; max-width:650px; }
+    #sr-spacious .studio-details[hidden] { display:none; }
+    #sr-spacious .studio-details h2 { font-size:28px; font-weight:500; letter-spacing:-.7px; }
+    #sr-spacious .studio-details p { font-size:17px; color:var(--studio-muted); line-height:1.8; margin-top:16px; }
+    #sr-spacious .studio-centered .studio-hero { display:flex; flex-direction:column; gap:0; padding:58px var(--studio-space) 0; text-align:center; }
+    #sr-spacious .studio-centered .studio-eyebrow { margin-bottom:25px !important; }
+    #sr-spacious .studio-centered h1 { font-size:clamp(52px,8.7cqw,92px); letter-spacing:-4.5px; line-height:1.02; }
+    #sr-spacious .studio-centered .studio-description { max-width:480px; margin:25px auto 0 !important; }
+    #sr-spacious .studio-centered .studio-action { margin-top:28px; }
+    #sr-spacious .studio-centered .studio-figure { width:100%; margin-top:64px; }
+    #sr-spacious .studio-centered .studio-art { min-height:280px; border-radius:180px 180px 0 0; background:radial-gradient(ellipse at 50% 100%,#6f744f 0,transparent 80%),#20221c; }
+    #sr-spacious .studio-centered .studio-art::before { inset:12% 32% -20%; border-radius:43% 57% 40% 60%; transform:rotate(-20deg); }
+    #sr-spacious .studio-centered .studio-art::after { inset:41% 44% 15%; transform:rotate(-20deg); }
+    #sr-spacious .studio-centered .studio-caption { margin-top:14px; margin-bottom:25px; }
+    @media(max-width:720px) {
+      #sr-spacious .studio { --studio-space:32px; }
+      #sr-spacious .studio-hero { gap:32px; padding-top:56px; padding-bottom:70px; }
+      #sr-spacious .studio h1 { font-size:58px; letter-spacing:-3px; }
+      #sr-spacious .studio-art { min-height:370px; border-radius:80px 80px 8px 8px; }
+      #sr-spacious .studio-description { font-size:17px; }
+    }
+    @media(max-width:580px) {
+      #sr-spacious .studio { --studio-space:24px; }
+      #sr-spacious .studio-header { padding-top:22px; padding-bottom:22px; }
+      #sr-spacious .studio-nav { gap:20px; }
+      #sr-spacious .studio-nav button { display:none; }
+      #sr-spacious .studio-brand { font-size:23px; }
+      #sr-spacious .studio-hero { grid-template-columns:1fr; padding-top:48px; gap:56px; }
+      #sr-spacious .studio h1 { font-size:clamp(40px,13cqw,54px); letter-spacing:-2.8px; }
+      #sr-spacious .studio-centered h1 { font-size:clamp(36px,11cqw,54px); letter-spacing:-2px; }
+      #sr-spacious .studio-description { max-width:330px; margin-top:26px !important; font-size:18px; }
+      #sr-spacious .studio-eyebrow { margin-bottom:23px !important; font-size:11px; }
+      #sr-spacious .studio-art { min-height:350px; }
+      #sr-spacious .studio-foot { flex-wrap:wrap; gap:12px; font-size:12px; }
+      #sr-spacious .studio-centered .studio-hero { padding-top:52px; }
+      #sr-spacious .studio-centered .studio-description { font-size:17px; }
+      #sr-spacious .studio-centered .studio-figure { margin-top:48px; }
+      #sr-spacious .studio-centered .studio-art { min-height:240px; border-radius:100px 100px 0 0; }
+      #sr-spacious .studio-centered .studio-art::before { inset:13% 16% -12%; }
+      #sr-spacious .studio-centered .studio-art::after { inset:43% 36% 18%; }
+    }
+  </style>
+
+      <div class="studio" aria-label="Open studio landing page">
+        <header class="studio-header"><div class="studio-brand">soggy<span>roll.</span></div><nav class="studio-nav" aria-label="Open studio navigation"><button type="button" data-process aria-expanded="false" aria-controls="open-studio-process">How it works</button><a href="https://soggyroll.art/sign-in" target="_blank" rel="noopener noreferrer">Sign in ↗</a></nav></header>
+        <section class="studio-hero" aria-label="Introduction">
+          <div><p class="studio-eyebrow">COMFYUI, ON DEMAND</p><h1>Make more.<br><em>Set up less.</em></h1><p class="studio-description">Run ComfyUI workflows without managing a GPU. Bring your idea. We'll handle the compute.</p><a class="studio-action" href="https://soggyroll.art/discover" target="_blank" rel="noopener noreferrer">Explore workflows <span aria-hidden="true">↗</span></a><p class="studio-note">Pay with credits. No subscription.</p></div>
+          <figure class="studio-figure"><div class="studio-art" role="img" aria-label="Illustration of an abstract chrome sculpture"></div><figcaption class="studio-caption">Illustrative artwork</figcaption></figure>
+        </section>
+        <section class="studio-details" id="open-studio-process" hidden><h2>From workflow to output.</h2><p>Choose a workflow, add your inputs, and select a priority. We run it on a GPU. Download your output when it's ready.</p></section>
+        <div class="studio-rule"></div><footer class="studio-foot"><span>Your ideas. Our compute.</span><span>More room for making.</span></footer>
+      </div>
+  <script>
+    (() => {
+      const root = document.getElementById('sr-spacious');
+      root.querySelectorAll('[data-process]').forEach(button => {
+        const panel = root.querySelector('#' + button.getAttribute('aria-controls'));
+        button.addEventListener('click', () => {
+          panel.hidden = !panel.hidden;
+          button.setAttribute('aria-expanded', String(!panel.hidden));
+          if (!panel.hidden) panel.scrollIntoView({ block: 'nearest' });
+        });
+      });
+      if (globalThis.Tweak) {
+        root.querySelectorAll('.studio').forEach(page => {
+          const design = { accent: '#e8f63f', spacing: 64 };
+          const render = () => {
+            page.style.setProperty('--studio-accent', design.accent);
+            page.style.setProperty('--studio-space', 'clamp(24px, ' + (design.spacing / 10) + 'cqw, ' + design.spacing + 'px)');
+          };
+          const tweak = new Tweak({ container: page, onChange: render });
+          tweak.addColorPicker(design, 'accent', { label: 'Accent color', reference: '--studio-accent' });
+          tweak.addSlider(design, 'spacing', { label: 'Outer spacing', min: 40, max: 90, unit: 'px', reference: '--studio-space' });
+        });
+      }
+    })();
+  </script>
+</div>

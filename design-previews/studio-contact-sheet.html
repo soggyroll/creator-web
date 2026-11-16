@@ -1,0 +1,86 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&amp;family=Instrument+Serif:ital@0;1&amp;display=swap">
+<div id="sr-contact">
+  <style>
+    #sr-contact { width:100%; }
+    #sr-contact .contact { --contact-yellow:#e7f24b; --contact-bg:#181917; --contact-ink:#ecebdc; background:var(--contact-bg); color:var(--contact-ink); font:400 16px/1.6 'DM Sans',sans-serif; container-type:inline-size; padding:0 48px; }
+    #sr-contact .contact * { box-sizing:border-box; }
+    #sr-contact .contact h1, #sr-contact .contact p, #sr-contact .contact figure { margin:0; }
+    #sr-contact .contact a { color:inherit; text-decoration:none; }
+    #sr-contact .contact button { font:inherit; cursor:pointer; }
+    #sr-contact .contact a:focus-visible, #sr-contact .contact button:focus-visible { outline:2px solid var(--contact-yellow); outline-offset:6px; }
+    #sr-contact .contact-header { display:grid; grid-template-columns:1fr 1fr 1fr; align-items:center; padding:32px 0 22px; gap:20px; font-size:13px; }
+    #sr-contact .contact-logo { font-weight:600; font-size:23px; letter-spacing:-1px; }
+    #sr-contact .contact-logo span { color:var(--contact-yellow); }
+    #sr-contact .contact-header p { text-align:center; color:#b3b7a7; font-size:12px; }
+    #sr-contact .contact-header a { justify-self:end; padding:12px 0; }
+    #sr-contact .contact-intro { display:grid; grid-template-columns:1.5fr 1fr; align-items:end; gap:50px; padding:50px 0 65px; }
+    #sr-contact .contact-intro h1 { font-family:'Instrument Serif',Georgia,serif; font-weight:400; font-size:clamp(56px,8.5cqw,91px); line-height:.98; letter-spacing:-2.7px; }
+    #sr-contact .contact-intro h1 em { font-weight:400; color:var(--contact-yellow); }
+    #sr-contact .contact-intro p { color:#bdc1b2; font-size:17px; line-height:1.7; max-width:270px; margin-bottom:5px; }
+    #sr-contact .contact-reel { position:relative; padding:25px 0; border-block:1px solid #6f746044; }
+    #sr-contact .contact-reel::before, #sr-contact .contact-reel::after { content:''; position:absolute; left:0; right:0; height:5px; background:repeating-linear-gradient(90deg,#686c5b 0 11px,transparent 11px 26px); opacity:.6; }
+    #sr-contact .contact-reel::before { top:9px; }
+    #sr-contact .contact-reel::after { bottom:9px; }
+    #sr-contact .contact-frames { display:grid; grid-template-columns:.8fr 1.4fr .8fr; gap:15px; }
+    #sr-contact .contact-frame { position:relative; height:270px; overflow:hidden; border:0; padding:0; display:block; width:100%; background:#333a27; }
+    #sr-contact .contact-frame[aria-pressed=true] { outline:2px solid var(--contact-yellow); outline-offset:4px; }
+    #sr-contact .contact-frame span { position:absolute; z-index:3; left:15px; bottom:14px; font-size:12px; color:#fbf8e7; background:#14160dcc; padding:3px 8px; }
+    #sr-contact .contact-clay { background:radial-gradient(ellipse at 50% 80%,#ba8060,#e3b68c); }
+    #sr-contact .contact-clay::before { content:''; position:absolute; inset:22% 16%; border-radius:38% 62% 44% 56%; transform:rotate(-23deg); background:radial-gradient(ellipse at 30% 20%,#ffc88e,#a64c30 70%,#602e1e); box-shadow:16px 14px 15px #70432c66,inset -5px -8px 12px #5a271933; }
+    #sr-contact .contact-clay::after { content:''; position:absolute; inset:41% 39%; border-radius:48%; background:#c0855d; transform:rotate(-23deg); box-shadow:inset 8px 5px 8px #71391f; }
+    #sr-contact .contact-land { background:linear-gradient(#afb7a1 0%,#c7c9a9 45%,#546248 46%,#788263 75%); }
+    #sr-contact .contact-land::before { content:''; position:absolute; width:145%; height:85%; left:-45%; top:40%; border-radius:50%; transform:rotate(18deg); background:linear-gradient(100deg,#233b2a,#adb587); box-shadow:0 -15px 0 #99a780,0 -29px 0 #6d805e; }
+    #sr-contact .contact-land::after { content:''; position:absolute; width:130%; height:82%; left:10%; top:69%; border-radius:50%; transform:rotate(-20deg); background:linear-gradient(150deg,#c2c995,#596e4b); box-shadow:0 -12px 0 #d5d4a4; }
+    #sr-contact .contact-signal { background:radial-gradient(ellipse at 80% 10%,#334a7f,#111a28 75%); }
+    #sr-contact .contact-signal::before { content:''; position:absolute; inset:11% -60% 6% -20%; border-radius:50%; transform:rotate(-35deg); background:repeating-radial-gradient(ellipse at 50% 50%,transparent 0 6px,#a9bfd0 7px 8px,transparent 9px 14px); }
+    #sr-contact .contact-after { display:flex; align-items:center; justify-content:space-between; gap:30px; padding:22px 0; font-size:12px; color:#a8ae9c; }
+    #sr-contact .contact-selection { color:var(--contact-ink); }
+    #sr-contact .contact-footer { display:flex; align-items:center; justify-content:space-between; gap:40px; padding:47px 0 56px; }
+    #sr-contact .contact-cta { display:inline-flex; align-items:center; gap:50px; border-bottom:1px solid var(--contact-yellow); color:var(--contact-yellow) !important; font-size:22px; padding:8px 0 14px; }
+    #sr-contact .contact-footer p { color:#a8ae9c; font-size:13px; text-align:right; }
+    @media(max-width:700px) {
+      #sr-contact .contact { padding-inline:28px; }
+      #sr-contact .contact-header { grid-template-columns:1fr 1fr; }
+      #sr-contact .contact-header p { display:none; }
+      #sr-contact .contact-intro { grid-template-columns:1fr; gap:28px; padding:40px 0 48px; }
+      #sr-contact .contact-intro h1 { font-size:clamp(51px,10cqw,70px); letter-spacing:-1.5px; }
+      #sr-contact .contact-intro p { max-width:390px; }
+      #sr-contact .contact-frames { grid-template-columns:.8fr 1.5fr; gap:12px; }
+      #sr-contact .contact-signal { display:none; }
+      #sr-contact .contact-frame { height:240px; }
+      #sr-contact .contact-after { align-items:start; flex-direction:column; gap:10px; }
+      #sr-contact .contact-footer { align-items:start; flex-direction:column; gap:25px; padding-top:30px; }
+      #sr-contact .contact-footer p { text-align:left; }
+    }
+    @media(max-width:380px) {
+      #sr-contact .contact { padding-inline:22px; }
+      #sr-contact .contact-intro h1 { font-size:49px; }
+      #sr-contact .contact-frame { height:190px; }
+      #sr-contact .contact-frame span { left:7px; bottom:9px; font-size:11px; }
+      #sr-contact .contact-cta { gap:26px; font-size:21px; }
+    }
+  </style>
+  <div class="contact" aria-label="Contact sheet landing page concept">
+    <header class="contact-header"><div class="contact-logo">soggy<span>roll.</span></div><p>A studio for your next idea.</p><a href="https://soggyroll.art/sign-in" target="_blank" rel="noopener noreferrer">Sign in ↗</a></header>
+    <section class="contact-intro" aria-label="Let an idea unfold"><h1>Let an idea<br><em>unfold.</em></h1><p>ComfyUI workflows, ready to run.<br>You make the creative calls.<br>We handle the compute.</p></section>
+    <section class="contact-reel" aria-label="Select an illustrative study"><div class="contact-frames"><button type="button" class="contact-frame contact-clay" aria-pressed="false" data-study="Clay forms" aria-label="Select Clay forms procedural illustration"><span>Clay forms</span></button><button type="button" class="contact-frame contact-land" aria-pressed="true" data-study="Dream terrain" aria-label="Select Dream terrain procedural illustration"><span>Dream terrain</span></button><button type="button" class="contact-frame contact-signal" aria-pressed="false" data-study="Signal studies" aria-label="Select Signal studies procedural illustration"><span>Signal studies</span></button></div></section>
+    <div class="contact-after"><span class="contact-selection" aria-live="polite">Dream terrain / selected study</span><span>Procedural illustrations · explore a different frame</span></div>
+    <footer class="contact-footer"><a class="contact-cta" href="https://soggyroll.art/discover" target="_blank" rel="noopener noreferrer">Find your starting point <span aria-hidden="true">↗</span></a><p>Pay with credits.<br>No subscription. No GPU setup.</p></footer>
+  </div>
+  <script>
+    (() => {
+      const root = document.getElementById('sr-contact');
+      const page = root.querySelector('.contact');
+      const frames = root.querySelectorAll('[data-study]');
+      frames.forEach(frame => frame.addEventListener('click', () => {
+        frames.forEach(other => other.setAttribute('aria-pressed', String(other === frame)));
+        root.querySelector('.contact-selection').textContent = frame.dataset.study + ' / selected study';
+      }));
+      if (globalThis.Tweak) {
+        const state = { accent: '#e7f24b' };
+        const tweak = new Tweak({ container: page, onChange: () => page.style.setProperty('--contact-yellow', state.accent) });
+        tweak.addColorPicker(state, 'accent', { label: 'Studio accent', reference: '--contact-yellow' });
+      }
+    })();
+  </script>
+</div>

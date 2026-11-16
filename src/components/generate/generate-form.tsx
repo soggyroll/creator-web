@@ -4,6 +4,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
 
@@ -13,6 +14,8 @@ import { api } from "@/lib/api";
 import { uploadFileToS3 } from "@/lib/upload";
 
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Field,
   FieldDescription,
@@ -98,7 +101,7 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
   const [selectedMediaInputId, setSelectedMediaInputId] = useState("");
   const [isMediaPreviewOpen, setIsMediaPreviewOpen] = useState(false);
 
-  const { data } = useWorkflow(workflowId);
+  const { data, isLoading, isError, refetch } = useWorkflow(workflowId);
   const workflow = data?.workflow;
 
   const fields = useMemo(
@@ -432,16 +435,22 @@ export default function GenerateForm({ workflowId }: GenerateFormProps) {
           ? "Fix failed media"
           : `Run batch (${drafts.length})`;
 
+  if (isLoading) return <Skeleton className="h-80 w-full rounded-none" aria-label="Loading generation inputs" />;
+
+  if (isError || !workflow) {
+    return <Alert variant="destructive"><AlertTitle>Workflow inputs unavailable.</AlertTitle><AlertDescription><p>Please try again or choose another workflow.</p><div className="flex flex-wrap gap-3"><Button variant="outline" onClick={() => refetch()}>Try again</Button><Button asChild><Link href="/discover">Browse workflows</Link></Button></div></AlertDescription></Alert>;
+  }
+
   return (
-    <div className="flex h-[calc(100vh-164px)] min-h-160 flex-col overflow-hidden">
+    <div className="generation-workspace">
       <form
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
         }}
-        className="flex min-h-0 flex-1 flex-col gap-6 overflow-hidden lg:flex-row"
+        className="flex min-w-0 flex-1 flex-col gap-8 lg:flex-row"
       >
-        <div className="min-w-0 flex-1 overflow-y-auto pr-2 scrollbar-hide">
+        <div className="min-w-0 flex-1">
           <div className="mx-auto max-w-3xl pb-10">
             <div className="mb-4 flex items-center justify-between">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">

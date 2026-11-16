@@ -1,0 +1,142 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&amp;family=Figtree:wght@400;500;600&amp;display=swap">
+<div id="sr-hybrid">
+  <style>
+    #sr-hybrid { width:100%; }
+    #sr-hybrid .hybrid { --hy-accent:#e6f247; --hy-ink:#f0eee4; --hy-muted:#b6bbaa; background:#171815; color:var(--hy-ink); font:400 16px/1.6 'Figtree',sans-serif; display:grid; grid-template-columns:70px minmax(0,1fr); container-type:inline-size; }
+    #sr-hybrid .hybrid * { box-sizing:border-box; }
+    #sr-hybrid .hybrid h1, #sr-hybrid .hybrid p, #sr-hybrid .hybrid figure { margin:0; }
+    #sr-hybrid .hybrid a { color:inherit; text-decoration:none; }
+    #sr-hybrid .hybrid button { font:inherit; cursor:pointer; }
+    #sr-hybrid .hybrid a:focus-visible, #sr-hybrid .hybrid button:focus-visible { outline:2px solid var(--hy-accent); outline-offset:5px; }
+    #sr-hybrid .hy-rail { display:flex; flex-direction:column; align-items:center; border-right:1px solid #ffffff26; padding:29px 0; gap:48px; }
+    #sr-hybrid .hy-mark { color:var(--hy-accent); font-size:28px; line-height:1; }
+    #sr-hybrid .hy-wordmark { writing-mode:vertical-rl; transform:rotate(180deg); font-weight:600; font-size:23px; letter-spacing:-.9px; }
+    #sr-hybrid .hy-rail-note { writing-mode:vertical-rl; margin-top:auto !important; color:#a1a88f; font-size:11px; letter-spacing:2px; }
+    #sr-hybrid .hy-sheet { min-width:0; padding:0 44px; }
+    #sr-hybrid .hy-header { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:23px 0; font-size:13px; }
+    #sr-hybrid .hy-header p { color:var(--hy-muted); }
+    #sr-hybrid .hy-header a { display:inline-flex; align-items:center; min-height:44px; }
+    #sr-hybrid .hy-intro { padding:28px 0 42px; }
+    #sr-hybrid .hy-headline { font-family:'Barlow Condensed',Impact,sans-serif; font-weight:600; font-size:clamp(64px,14.8cqw,150px); line-height:.88; letter-spacing:-2.8px; text-transform:uppercase; }
+    #sr-hybrid .hy-headline span { display:block; }
+    #sr-hybrid .hy-headline span:last-child { margin-top:13px; padding-left:14%; color:var(--hy-accent); }
+    #sr-hybrid .hy-invitation { display:grid; grid-template-columns:1.2fr 1fr; align-items:center; gap:52px; margin-top:38px; }
+    #sr-hybrid .hy-description { color:#c4c9b8; font-size:17px; line-height:1.65; max-width:355px; }
+    #sr-hybrid .hy-description strong { color:var(--hy-ink); font-weight:500; }
+    #sr-hybrid .hy-cta { background:var(--hy-accent); color:#1c230c !important; padding:17px 22px; min-height:94px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    #sr-hybrid .hy-cta-label { font-size:24px; font-weight:600; line-height:1.12; letter-spacing:-.6px; }
+    #sr-hybrid .hy-cta-arrow { font-size:43px; line-height:1; font-weight:400; transition:transform 180ms ease; }
+    #sr-hybrid .hy-cta:hover .hy-cta-arrow { transform:translate(3px,-3px); }
+    #sr-hybrid .hy-reel { padding:24px 0; position:relative; border-block:1px solid #6f746055; }
+    #sr-hybrid .hy-reel::before, #sr-hybrid .hy-reel::after { content:''; position:absolute; height:5px; left:0; right:0; opacity:.6; background:repeating-linear-gradient(90deg,#747a63 0 11px,transparent 11px 26px); }
+    #sr-hybrid .hy-reel::before { top:9px; }
+    #sr-hybrid .hy-reel::after { bottom:9px; }
+    #sr-hybrid .hy-frames { display:grid; grid-template-columns:.8fr 1.4fr .8fr; gap:14px; }
+    #sr-hybrid .hy-frame { height:220px; position:relative; isolation:isolate; overflow:hidden; border:0; padding:0; width:100%; display:block; background:#333a27; }
+    #sr-hybrid .hy-frame[aria-pressed=true] { outline:2px solid var(--hy-accent); outline-offset:4px; }
+    #sr-hybrid .hy-frame-caption { position:absolute; z-index:3; left:12px; bottom:12px; color:#f3f2e6; background:#151710d9; padding:3px 8px; font-size:12px; }
+    #sr-hybrid .hy-frame-index { display:none; }
+    #sr-hybrid .hy-clay { background:radial-gradient(ellipse at 50% 80%,#ba8060,#e3b68c); }
+    #sr-hybrid .hy-clay::before { content:''; position:absolute; inset:22% 16%; border-radius:38% 62% 44% 56%; transform:rotate(-23deg); background:radial-gradient(ellipse at 30% 20%,#ffc88e,#a64c30 70%,#602e1e); box-shadow:16px 14px 15px #70432c66,inset -5px -8px 12px #5a271933; }
+    #sr-hybrid .hy-clay::after { content:''; position:absolute; inset:41% 39%; border-radius:48%; background:#c0855d; transform:rotate(-23deg); box-shadow:inset 8px 5px 8px #71391f; }
+    #sr-hybrid .hy-terrain { background:linear-gradient(#afb7a1 0%,#c7c9a9 45%,#546248 46%,#788263 75%); }
+    #sr-hybrid .hy-terrain::before { content:''; position:absolute; width:145%; height:85%; left:-45%; top:40%; border-radius:50%; transform:rotate(18deg); background:linear-gradient(100deg,#233b2a,#adb587); box-shadow:0 -15px 0 #99a780,0 -29px 0 #6d805e; }
+    #sr-hybrid .hy-terrain::after { content:''; position:absolute; width:130%; height:82%; left:10%; top:69%; border-radius:50%; transform:rotate(-20deg); background:linear-gradient(150deg,#c2c995,#596e4b); box-shadow:0 -12px 0 #d5d4a4; }
+    #sr-hybrid .hy-signal { background:radial-gradient(ellipse at 80% 10%,#334a7f,#111a28 75%); }
+    #sr-hybrid .hy-signal::before { content:''; position:absolute; inset:11% -60% 6% -20%; border-radius:50%; transform:rotate(-35deg); background:repeating-radial-gradient(ellipse at 50% 50%,transparent 0 6px,#a9bfd0 7px 8px,transparent 9px 14px); }
+    #sr-hybrid .hy-caption { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:19px 0; font-size:12px; color:#a5ad95; }
+    #sr-hybrid .hy-current { color:#d9ddce; }
+    #sr-hybrid .hy-footer { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:17px 0 29px; font-size:12px; color:#a5ad95; }
+    #sr-hybrid .hy-footer a { color:var(--hy-ink); display:inline-flex; align-items:center; gap:12px; min-height:44px; border-bottom:1px solid #5e674b; }
+    @media(max-width:780px) {
+      #sr-hybrid .hy-sheet { padding-inline:30px; }
+      #sr-hybrid .hy-invitation { gap:28px; grid-template-columns:1fr 1fr; }
+      #sr-hybrid .hy-cta { padding:15px 18px; }
+      #sr-hybrid .hy-cta-label { font-size:22px; }
+      #sr-hybrid .hy-frame { height:200px; }
+    }
+    @media(max-width:600px) {
+      #sr-hybrid .hybrid { grid-template-columns:45px minmax(0,1fr); }
+      #sr-hybrid .hy-sheet { padding-inline:22px; }
+      #sr-hybrid .hy-rail { padding-top:27px; }
+      #sr-hybrid .hy-mark { font-size:22px; }
+      #sr-hybrid .hy-wordmark { font-size:19px; }
+      #sr-hybrid .hy-rail-note { font-size:11px; letter-spacing:1.5px; }
+      #sr-hybrid .hy-header { gap:18px; font-size:12px; padding:17px 0; }
+      #sr-hybrid .hy-header p { max-width:150px; }
+      #sr-hybrid .hy-header a { white-space:nowrap; }
+      #sr-hybrid .hy-intro { padding-top:32px; padding-bottom:35px; }
+      #sr-hybrid .hy-headline { font-size:14cqw; letter-spacing:-1px; }
+      #sr-hybrid .hy-headline span:last-child { padding-left:8%; margin-top:11px; }
+      #sr-hybrid .hy-invitation { grid-template-columns:1fr; margin-top:29px; gap:27px; }
+      #sr-hybrid .hy-description { font-size:16px; }
+      #sr-hybrid .hy-cta { min-height:87px; padding:17px 20px; }
+      #sr-hybrid .hy-cta-label { font-size:24px; }
+      #sr-hybrid .hy-frames { gap:9px; grid-template-columns:1fr 1.25fr 1fr; }
+      #sr-hybrid .hy-frame { height:165px; }
+      #sr-hybrid .hy-frame-caption { left:6px; bottom:8px; padding:3px 6px; font-size:11px; }
+      #sr-hybrid .hy-frame-name { display:none; }
+      #sr-hybrid .hy-frame-index { display:inline; }
+      #sr-hybrid .hy-caption { flex-direction:column; align-items:start; gap:7px; padding-top:20px; }
+      #sr-hybrid .hy-footer { align-items:start; flex-direction:column; gap:8px; padding-top:4px; }
+    }
+    @media(max-width:360px) {
+      #sr-hybrid .hy-sheet { padding-inline:17px; }
+      #sr-hybrid .hy-header p { max-width:120px; }
+      #sr-hybrid .hy-headline { font-size:13.6cqw; }
+      #sr-hybrid .hy-cta { padding-inline:16px; }
+      #sr-hybrid .hy-cta-label { font-size:23px; }
+    }
+    @media(prefers-reduced-motion:reduce) { #sr-hybrid .hy-cta-arrow { transition:none; } }
+  </style>
+  <div class="hybrid" aria-label="Poster and contact sheet combined landing page concept">
+    <aside class="hy-rail" aria-label="Soggy Roll brand"><span class="hy-mark" aria-hidden="true">✳</span><div class="hy-wordmark">soggyroll.</div><p class="hy-rail-note">A LITTLE LESS ORDINARY</p></aside>
+    <div class="hy-sheet">
+      <header class="hy-header"><p>ComfyUI, without the setup.</p><a href="https://soggyroll.art/sign-in" target="_blank" rel="noopener noreferrer">Sign in ↗</a></header>
+      <section class="hy-intro" aria-label="Make room for ideas">
+        <h1 class="hy-headline"><span>Make room.</span><span>For ideas.</span></h1>
+        <div class="hy-invitation"><p class="hy-description"><strong>Your workflows. Our GPUs.</strong><br>We handle the compute so you can spend more time creating.</p><a class="hy-cta" href="https://soggyroll.art/discover" target="_blank" rel="noopener noreferrer"><span class="hy-cta-label">Find your<br>starting point</span><span class="hy-cta-arrow" aria-hidden="true">↗</span></a></div>
+      </section>
+      <section class="hy-reel" aria-label="Explore illustrative studies">
+        <div class="hy-frames">
+          <button type="button" class="hy-frame hy-clay" data-study="clay" aria-pressed="false" aria-label="Select Clay forms procedural illustration"><span class="hy-frame-caption"><span class="hy-frame-index">01</span><span class="hy-frame-name">Clay forms</span></span></button>
+          <button type="button" class="hy-frame hy-terrain" data-study="terrain" aria-pressed="true" aria-label="Select Dream terrain procedural illustration"><span class="hy-frame-caption"><span class="hy-frame-index">02</span><span class="hy-frame-name">Dream terrain</span></span></button>
+          <button type="button" class="hy-frame hy-signal" data-study="signal" aria-pressed="false" aria-label="Select Signal studies procedural illustration"><span class="hy-frame-caption"><span class="hy-frame-index">03</span><span class="hy-frame-name">Signal studies</span></span></button>
+        </div>
+      </section>
+      <div class="hy-caption"><span class="hy-current" aria-live="polite">02 / Dream terrain</span><span>Procedural illustrations · select a frame</span></div>
+      <footer class="hy-footer"><p>Pay with credits. No subscription. No GPU setup.</p><a href="https://soggyroll.art/discover" target="_blank" rel="noopener noreferrer">Explore workflows <span aria-hidden="true">↗</span></a></footer>
+    </div>
+  </div>
+  <script>
+    (() => {
+      const root = document.getElementById('sr-hybrid');
+      const page = root.querySelector('.hybrid');
+      const buttons = Array.from(root.querySelectorAll('[data-study]'));
+      const names = { clay: '01 / Clay forms', terrain: '02 / Dream terrain', signal: '03 / Signal studies' };
+      const select = value => {
+        const study = Object.hasOwn(names, value) ? value : 'terrain';
+        buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.study === study)));
+        root.querySelector('.hy-current').textContent = names[study];
+        return study;
+      };
+      buttons.forEach(button => button.addEventListener('click', () => {
+        const study = select(button.dataset.study);
+        if (window.openai && window.openai.setWidgetState) {
+          window.openai.setWidgetState({ modelContent: { hybridStudy: study }, privateContent: null }).catch(() => {});
+        }
+      }));
+      const saved = window.openai && window.openai.widgetState;
+      select(saved && saved.modelContent && saved.modelContent.hybridStudy);
+      window.addEventListener('openai:set_globals', event => {
+        const state = event.detail && event.detail.globals && event.detail.globals.widgetState;
+        if (state) select(state.modelContent && state.modelContent.hybridStudy);
+      });
+      if (globalThis.Tweak) {
+        const state = { accent: '#e6f247' };
+        const tweak = new Tweak({ container: page, onChange: () => page.style.setProperty('--hy-accent', state.accent) });
+        tweak.addColorPicker(state, 'accent', { label: 'Studio accent', reference: '--hy-accent' });
+      }
+    })();
+  </script>
+</div>

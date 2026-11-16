@@ -1,118 +1,33 @@
-/** @format */
-
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { ImageIcon } from "lucide-react";
-
+import { ArrowUpRight, ImageIcon } from "lucide-react";
 import { useGenerations } from "@/hooks/use-generations";
-import {
-  formatGenerationStatus,
-  statusColorClass,
-  statusVariant,
-} from "@/lib/generation-utils";
+import { formatGenerationStatus, statusColorClass, statusVariant } from "@/lib/generation-utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import Image from "next/image";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { PageHeading } from "@/components/studio/page-heading";
 
 export default function GenerationsPage() {
-  const { data: generations, isLoading } = useGenerations({ limit: 100 });
+  const { data: generations, isLoading, isError, refetch } = useGenerations({ limit: 100 });
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-6 py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight">Generations</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          All your image generation requests
-        </p>
-      </div>
-
-      {isLoading ? (
-        <div className="flex flex-col divide-y rounded-lg border">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-4 px-4 py-4">
-              <Skeleton className="size-12 shrink-0 rounded-md" />
-              <div className="flex flex-1 flex-col gap-2">
-                <Skeleton className="h-4 w-48" />
-                <Skeleton className="h-3 w-32" />
-              </div>
-              <Skeleton className="h-5 w-20 rounded-full" />
-            </div>
-          ))}
-        </div>
-      ) : !generations?.data?.length ? (
-        <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-20 text-center">
-          <ImageIcon className="size-10 opacity-30" />
-          <div>
-            <p className="text-sm font-medium">No generations yet</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              Your generation history will appear here
-            </p>
-          </div>
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/discover">Find a workflow to use</Link>
-          </Button>
-        </div>
-      ) : (
-        <div className="flex flex-col divide-y rounded-lg border">
-          {generations.data.map((gen) => {
-            return (
-              <div
-                key={gen.id}
-                className="flex items-center gap-4 px-4 py-3 transition-colors hover:bg-muted/40"
-              >
-                {/* Thumbnail */}
-                <div className="size-12 shrink-0 overflow-hidden rounded-md bg-muted">
-                  {gen.output_url ? (
-                    <Image
-                      src={gen.output_url}
-                      alt=""
-                      width={48}
-                      height={48}
-                      className="size-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex size-full items-center justify-center">
-                      <ImageIcon className="size-5 opacity-30" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">
-                    {gen.workflow.name}
-                  </p>
-                  <p className="mt-0.5 font-mono text-xs text-muted-foreground">
-                    <span className="ml-2 not-mono font-sans">
-                      {new Date(gen.enqueued_at).toLocaleString()}
-                    </span>
-                  </p>
-                </div>
-
-                {/* Credits */}
-                <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
-                  {gen.workflow.cost} cr
-                </span>
-
-                {/* Status */}
-                <Badge
-                  variant={statusVariant(gen.status)}
-                  className={statusColorClass(gen.status)}
-                >
-                  {formatGenerationStatus(gen.status)}
-                </Badge>
-
-                {/* Action */}
-                <Button variant="ghost" size="sm" asChild className="shrink-0">
-                  <Link href={`/generations/${gen.id}`}>View</Link>
-                </Button>
-              </div>
-            );
-          })}
-        </div>
-      )}
+    <div className="studio-page">
+      <PageHeading eyebrow="Your generation history" title={<>Made by<br /><span className="text-primary">you.</span></>} description="The ideas you've set in motion. Check a generation, follow its progress, or pick up your output.">
+        <Button asChild><Link href="/discover">Make something new <ArrowUpRight data-icon="inline-end" /></Link></Button>
+      </PageHeading>
+      {isLoading ? <div className="flex flex-col gap-5" aria-label="Loading generations">{Array.from({ length: 5 }, (_, index) => <Skeleton key={index} className="h-24 w-full rounded-none" />)}</div>
+        : isError ? <Alert variant="destructive"><AlertTitle>We couldn&apos;t load your generations.</AlertTitle><AlertDescription><p>Please try again in a moment.</p><Button variant="outline" onClick={() => refetch()}>Try again</Button></AlertDescription></Alert>
+        : !generations?.data?.length ? <section className="border-y py-16"><ImageIcon className="mb-5 size-8 text-muted-foreground" aria-hidden="true" /><h2 className="font-display text-3xl uppercase">Your next idea belongs here.</h2><p className="mt-3 text-sm leading-relaxed text-muted-foreground">Your generation history will appear here after your first run.</p><Link href="/discover" className="studio-text-link mt-4">Find a workflow <ArrowUpRight aria-hidden="true" /></Link></section>
+        : <div className="studio-history">{generations.data.map(gen => <article key={gen.id} className="studio-history-row">
+          <div className="studio-history-thumbnail">{gen.output_url ? <Image src={gen.output_url} alt="" fill sizes="72px" className="object-cover" /> : <ImageIcon className="size-5 text-muted-foreground" aria-hidden="true" />}</div>
+          <div className="min-w-0"><Link href={`/generations/${gen.id}`} className="block truncate font-medium hover:text-primary">{gen.workflow.name}</Link><p className="mt-1 text-xs leading-relaxed text-muted-foreground">{new Date(gen.enqueued_at).toLocaleString()}</p><p className="mt-1 text-xs text-muted-foreground">{gen.workflow.cost} credits</p></div>
+          <Badge variant={statusVariant(gen.status)} className={statusColorClass(gen.status)}>{formatGenerationStatus(gen.status)}</Badge>
+          <Link href={`/generations/${gen.id}`} className="studio-text-link" aria-label={`View ${gen.workflow.name} generation`}>View <ArrowUpRight aria-hidden="true" /></Link>
+        </article>)}</div>}
     </div>
   );
 }

@@ -2,6 +2,18 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+The frontend runs on port **3000** and the local backend runs on port **3001**.
+Copy `.env.example` to `.env`, keep the required authentication settings, and set:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
+
+Both browser and server API clients use this value and append `/api/v1`.
+Restart the development server after changing it. Production builds inline
+`NEXT_PUBLIC_` variables, so rebuild before restarting production. An exported
+shell variable or `.env.local` takes precedence over `.env`.
+
 First, run the development server:
 
 ```bash

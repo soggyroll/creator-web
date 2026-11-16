@@ -1,30 +1,14 @@
-/** @format */
 "use client";
 
 import { useWorkflow } from "@/hooks/use-workflow";
-import { FC } from "react";
+import { PageHeading } from "@/components/studio/page-heading";
+import { Skeleton } from "@/components/ui/skeleton";
 
-interface GenerateHeadingProps {
-  workflowId: string;
-}
-
-const GenerateHeading: FC<GenerateHeadingProps> = ({ workflowId }) => {
-  const { data } = useWorkflow(workflowId);
+export default function GenerateHeading({ workflowId }: { workflowId: string }) {
+  const { data, isLoading } = useWorkflow(workflowId);
   const workflow = data?.workflow;
 
-  return (
-    <div className="flex flex-col gap-1.5">
-      <h1 className="text-3xl">
-        <span className="text-muted-foreground">
-          {workflow?.team?.name ?? "workflows"}/
-        </span>
-        {workflow?.name}
-      </h1>
-      <p className="text-muted-foreground max-w-3xl">
-        {workflow?.description ?? "Generate an image using the power of AI."}
-      </p>
-    </div>
-  );
-};
+  if (isLoading) return <div className="mb-10 flex flex-col gap-4" aria-label="Loading workflow"><Skeleton className="h-16 w-full max-w-md" /><Skeleton className="h-5 w-full max-w-lg" /></div>;
 
-export default GenerateHeading;
+  return <PageHeading eyebrow={workflow?.team?.name ?? "Your creative workspace"} title={workflow?.name ?? "Make it your own."} description={workflow?.description ?? "Add your inputs, pick a priority, and bring your next idea to life."} />;
+}

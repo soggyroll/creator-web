@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8080",
+    "host": "localhost:3001",
     "basePath": "/",
     "paths": {
         "/admin/credits/teams/{teamID}/seed": {

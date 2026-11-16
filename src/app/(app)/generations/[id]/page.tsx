@@ -25,6 +25,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDurationCompact } from "@/lib/utils";
+import { PageHeading } from "@/components/studio/page-heading";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const STEPS = [
   { key: "queued", label: "Queued", icon: ClockIcon },
@@ -47,7 +49,7 @@ export default function GenerationDetailPage({
   params,
 }: GenerationDetailPageProps) {
   const { id } = use(params);
-  const { data: gen, isLoading } = useGeneration(id);
+  const { data: gen, isLoading, isError, refetch } = useGeneration(id);
 
   const activeStep = getStepIndex(gen?.status);
   const isFailed = gen?.status === "failed";
@@ -57,8 +59,12 @@ export default function GenerationDetailPage({
     gen?.finished_at,
   );
 
+  if (!isLoading && (isError || !gen)) {
+    return <div className="studio-page"><PageHeading eyebrow="Your generation history" title="Generation unavailable." /><Alert variant="destructive"><AlertTitle>We couldn&apos;t open this generation.</AlertTitle><AlertDescription><p>Please try again or return to your generation history.</p><div className="flex flex-wrap gap-3"><Button variant="outline" onClick={() => refetch()}>Try again</Button><Button asChild><Link href="/generations">All generations</Link></Button></div></AlertDescription></Alert></div>;
+  }
+
   return (
-    <div className="mx-auto w-full max-w-4xl px-6 py-8">
+    <div className="studio-page">
       {/* Back */}
       <Link
         href="/generations"
@@ -71,11 +77,11 @@ export default function GenerationDetailPage({
       {/* Header */}
       <div className="mt-6 flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <h1 className="studio-title">
             {gen?.workflow?.name ?? "Generation"}
           </h1>
           {gen?.id && (
-            <p className="mt-1 font-mono text-xs text-muted-foreground">
+            <p className="mt-4 break-all font-mono text-xs text-muted-foreground">
               {gen.id}
             </p>
           )}
@@ -206,7 +212,7 @@ export default function GenerationDetailPage({
           {gen?.error_log && (
             <div className="mt-4 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2.5">
               <p className="mb-1 text-xs font-medium text-destructive">Error</p>
-              <p className="font-mono text-xs text-destructive">
+              <p className="break-words font-mono text-xs text-destructive">
                 {gen.error_log}
               </p>
             </div>
@@ -347,7 +353,7 @@ export default function GenerationDetailPage({
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-4 py-3">
+    <div className="flex flex-wrap items-center justify-between gap-2 py-3">
       <dt className="text-xs text-muted-foreground">{label}</dt>
       <dd className="text-xs font-medium tabular-nums">{value}</dd>
     </div>

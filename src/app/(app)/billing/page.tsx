@@ -10,10 +10,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatLedgerEntryKind } from "@/lib/utils";
+import { PageHeading } from "@/components/studio/page-heading";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function BillingPage() {
-  const { data: credits, isLoading: loadingCredits } = useCreditBalance();
-  const { data: transactions, isLoading: loadingTx } = useTransactionHistory();
+  const { data: credits, isLoading: loadingCredits, isError: creditError, refetch: refetchCredits } = useCreditBalance();
+  const { data: transactions, isLoading: loadingTx, isError: transactionError, refetch: refetchTransactions } = useTransactionHistory();
 
   function handleBuyCredits() {
     // TODO: redirect to Stripe checkout once the billing endpoint is available
@@ -21,17 +23,12 @@ export default function BillingPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-6 py-8">
+    <div className="studio-page">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Billing</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Manage your credits and purchases
-        </p>
-      </div>
+      <PageHeading eyebrow="Credits & billing" title={<>More room<br /><span className="text-primary">to create.</span></>} description="Your credits and transaction history. Keep track of what goes into your next idea." />
 
       {/* Balance row */}
-      <div className="flex flex-wrap items-end justify-between gap-4 border-b pb-8">
+      <div className="studio-balance">
         <div>
           <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
             Current balance
@@ -39,7 +36,7 @@ export default function BillingPage() {
           {loadingCredits ? (
             <Skeleton className="mt-2 h-10 w-32" />
           ) : (
-            <p className="mt-1 text-4xl font-semibold tabular-nums">
+            <p className="studio-balance-value tabular-nums">
               {credits?.balance?.toLocaleString() ?? "—"}
               <span className="ml-2 text-lg font-normal text-muted-foreground">
                 credits
@@ -53,22 +50,24 @@ export default function BillingPage() {
         </Button>
       </div>
 
+      {creditError && <Alert variant="destructive" className="mt-6"><AlertTitle>Credit balance unavailable.</AlertTitle><AlertDescription><Button variant="outline" onClick={() => refetchCredits()}>Try again</Button></AlertDescription></Alert>}
+
       {/* Transaction history */}
       <div className="mt-8">
         <p className="mb-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">
           Transaction History
         </p>
 
-        {loadingTx ? (
+        {transactionError ? <Alert variant="destructive"><AlertTitle>Transaction history unavailable.</AlertTitle><AlertDescription><Button variant="outline" onClick={() => refetchTransactions()}>Try again</Button></AlertDescription></Alert> : loadingTx ? (
           <div className="flex flex-col divide-y rounded-lg border">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="flex items-center gap-4 px-4 py-4">
                 <Skeleton className="size-8 shrink-0 rounded-full" />
-                <div className="flex flex-1 flex-col gap-2">
-                  <Skeleton className="h-4 w-52" />
-                  <Skeleton className="h-3 w-28" />
+                <div className="flex min-w-0 flex-1 flex-col gap-2">
+                  <Skeleton className="h-4 w-full max-w-52" />
+                  <Skeleton className="h-3 w-full max-w-28" />
                 </div>
-                <Skeleton className="h-5 w-12" />
+                <Skeleton className="h-5 w-12 shrink-0" />
               </div>
             ))}
           </div>
@@ -87,7 +86,7 @@ export default function BillingPage() {
             {transactions.data.map((tx) => (
               <div
                 key={tx.id}
-                className="flex items-center gap-4 px-4 py-3 transition-colors hover:bg-muted/40"
+                className="flex flex-wrap items-center gap-4 px-4 py-4 transition-colors hover:bg-muted/40"
               >
                 {/* Icon */}
                 <div

@@ -1,0 +1,87 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&amp;family=Figtree:wght@400;500;600&amp;display=swap">
+<div id="sr-poster">
+  <style>
+    #sr-poster { width:100%; }
+    #sr-poster .poster { --poster-yellow:#e4f344; --poster-paper:#f0eee4; background:#171815; color:var(--poster-paper); font:400 16px/1.6 'Figtree',sans-serif; display:grid; grid-template-columns:70px minmax(0,1fr); container-type:inline-size; }
+    #sr-poster .poster * { box-sizing:border-box; }
+    #sr-poster .poster h1, #sr-poster .poster p, #sr-poster .poster figure { margin:0; }
+    #sr-poster .poster a { color:inherit; text-decoration:none; }
+    #sr-poster .poster button { font:inherit; cursor:pointer; }
+    #sr-poster .poster a:focus-visible, #sr-poster .poster button:focus-visible { outline:2px solid var(--poster-yellow); outline-offset:6px; }
+    #sr-poster .poster-rail { border-right:1px solid #ffffff24; display:flex; flex-direction:column; align-items:center; padding:30px 0; gap:48px; }
+    #sr-poster .poster-mark { font-size:27px; color:var(--poster-yellow); line-height:1; }
+    #sr-poster .poster-wordmark { writing-mode:vertical-rl; transform:rotate(180deg); font-weight:600; font-size:22px; letter-spacing:-.8px; }
+    #sr-poster .poster-rail-note { writing-mode:vertical-rl; margin-top:auto !important; font-size:11px; letter-spacing:2px; color:#abae9e; }
+    #sr-poster .poster-sheet { min-width:0; padding:0 46px; }
+    #sr-poster .poster-nav { display:flex; justify-content:space-between; align-items:center; padding:28px 0; gap:20px; font-size:13px; }
+    #sr-poster .poster-nav p { color:#b8bcaa; }
+    #sr-poster .poster-nav a { min-height:44px; display:flex; align-items:center; }
+    #sr-poster .poster-composition { position:relative; padding:47px 0 35px; isolation:isolate; }
+    #sr-poster .poster-heading { font-family:'Barlow Condensed',Impact,sans-serif; font-weight:600; font-size:clamp(65px,15cqw,154px); line-height:.84; letter-spacing:-3px; text-transform:uppercase; position:relative; z-index:2; }
+    #sr-poster .poster-heading span { display:block; }
+    #sr-poster .poster-heading .poster-second { margin-top:17px; padding-left:17%; }
+    #sr-poster .poster-heading .poster-last { margin-top:17px; color:var(--poster-yellow); }
+    #sr-poster .poster-visual { margin:30px 0 31px !important; height:188px; position:relative; overflow:hidden; background:#d7e546; }
+    #sr-poster .poster-visual::before { content:''; position:absolute; width:73%; height:320%; left:9%; top:-80%; border-radius:50%; transform:rotate(-33deg); background:repeating-radial-gradient(ellipse at 45% 50%,#dce94f 0 3px,#323b19 4px 7px,#a5b533 8px 10px); box-shadow:20px 20px 40px #34420d77; }
+    #sr-poster .poster-visual::after { content:''; position:absolute; width:75%; height:340%; left:52%; top:-105%; transform:rotate(29deg); border-radius:50%; background:repeating-radial-gradient(ellipse at 45% 50%,#e1ed63 0 3px,#4a5625 4px 7px,#a5b533 8px 10px); box-shadow:-20px 20px 40px #34420d77; }
+    #sr-poster .poster-foot { display:grid; grid-template-columns:1fr auto; gap:48px; align-items:end; padding:17px 0 50px; }
+    #sr-poster .poster-description { max-width:340px; font-size:17px; color:#c6c9ba; line-height:1.65; }
+    #sr-poster .poster-note { font-size:12px; color:#9da48d; margin-top:18px !important; }
+    #sr-poster .poster-cta { display:flex; align-items:center; justify-content:space-between; gap:30px; padding:17px 22px; background:var(--poster-yellow); color:#1b210b !important; font-weight:600; font-size:15px; min-height:57px; }
+    #sr-poster .poster-edit { background:transparent; color:#b8bcaa; border:0; padding:10px 0; font-size:12px; }
+    #sr-poster .poster-caption { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-top:-21px; padding-bottom:20px; color:#9da48d; font-size:11px; }
+    #sr-poster .poster[data-study=waves] .poster-visual { background:#5c2349; }
+    #sr-poster .poster[data-study=waves] .poster-visual::before { left:-4%; top:-95%; background:repeating-radial-gradient(ellipse at 45% 50%,#e0b7d4 0 3px,#532043 4px 7px,#a25282 8px 10px); }
+    #sr-poster .poster[data-study=waves] .poster-visual::after { left:62%; transform:rotate(65deg); background:repeating-radial-gradient(ellipse at 45% 50%,#d6dd9a 0 3px,#5d6930 4px 7px,#9fa863 8px 10px); }
+    @media(max-width:680px) {
+      #sr-poster .poster { grid-template-columns:48px minmax(0,1fr); }
+      #sr-poster .poster-sheet { padding-inline:26px; }
+      #sr-poster .poster-wordmark { font-size:19px; }
+      #sr-poster .poster-nav { font-size:12px; padding:20px 0; }
+      #sr-poster .poster-composition { padding-top:45px; }
+      #sr-poster .poster-heading { font-size:15cqw; letter-spacing:-1.5px; }
+      #sr-poster .poster-visual { height:160px; margin-block:25px !important; }
+      #sr-poster .poster-foot { gap:28px; grid-template-columns:1fr; padding-top:10px; }
+      #sr-poster .poster-description { font-size:17px; }
+      #sr-poster .poster-cta { width:100%; }
+      #sr-poster .poster-caption { align-items:start; }
+    }
+    @media(max-width:380px) {
+      #sr-poster .poster-sheet { padding-inline:18px; }
+      #sr-poster .poster-nav p { max-width:110px; }
+      #sr-poster .poster-heading { font-size:14.5cqw; }
+      #sr-poster .poster-caption { flex-wrap:wrap; }
+    }
+  </style>
+  <div class="poster" aria-label="Off-grid poster landing page" data-study="folds">
+    <aside class="poster-rail" aria-label="Soggy Roll brand"><span class="poster-mark" aria-hidden="true">✳</span><div class="poster-wordmark">soggyroll.</div><p class="poster-rail-note">A LITTLE LESS ORDINARY</p></aside>
+    <div class="poster-sheet">
+      <header class="poster-nav"><p>ComfyUI, without the setup.</p><a href="https://soggyroll.art/sign-in" target="_blank" rel="noopener noreferrer">Sign in ↗</a></header>
+      <section class="poster-composition" aria-label="Make room for your ideas">
+        <h1 class="poster-heading"><span>Make room</span><span class="poster-second">for your</span><span class="poster-last">next idea.</span></h1>
+        <figure class="poster-visual" role="img" aria-label="Procedural illustration of folded lime colored paper"></figure>
+        <div class="poster-caption"><span>Procedural study / <span data-study-label>Folded light</span></span><button class="poster-edit" type="button">Change the study ↗</button></div>
+      </section>
+      <footer class="poster-foot"><div><p class="poster-description">Bring a workflow. We'll bring the GPUs.<br>Less infrastructure. More imagination.</p><p class="poster-note">Pay with credits. No subscription.</p></div><a class="poster-cta" href="https://soggyroll.art/discover" target="_blank" rel="noopener noreferrer">Find your workflow <span aria-hidden="true">↗</span></a></footer>
+    </div>
+  </div>
+  <script>
+    (() => {
+      const root = document.getElementById('sr-poster');
+      const page = root.querySelector('.poster');
+      const label = root.querySelector('[data-study-label]');
+      const art = root.querySelector('.poster-visual');
+      root.querySelector('.poster-edit').addEventListener('click', () => {
+        const waves = page.dataset.study !== 'waves';
+        page.dataset.study = waves ? 'waves' : 'folds';
+        label.textContent = waves ? 'Color interference' : 'Folded light';
+        art.setAttribute('aria-label', waves ? 'Procedural illustration of intersecting magenta and green waves' : 'Procedural illustration of folded lime colored paper');
+      });
+      if (globalThis.Tweak) {
+        const state = { accent: '#e4f344' };
+        const tweak = new Tweak({ container: page, onChange: () => page.style.setProperty('--poster-yellow', state.accent) });
+        tweak.addColorPicker(state, 'accent', { label: 'Poster accent', reference: '--poster-yellow' });
+      }
+    })();
+  </script>
+</div>

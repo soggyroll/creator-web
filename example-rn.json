@@ -1,0 +1,110 @@
+[
+  {
+    "title": "Last Frame",
+    "node_id": "137",
+    "class_type": "LoadImage",
+    "input_kind": "media",
+    "value_type": "image",
+    "input_field": "image",
+    "current_value": "ltx23_flf2v_last_frame.png"
+  },
+  {
+    "title": "First Frame",
+    "node_id": "138",
+    "class_type": "LoadImage",
+    "input_kind": "media",
+    "value_type": "image",
+    "input_field": "image",
+    "current_value": "ltx23_flf2v_first_frame.png"
+  },
+  {
+    "title": "Positive Prompt",
+    "node_id": "146",
+    "class_type": "PrimitiveStringMultiline",
+    "input_kind": "primitive",
+    "value_type": "string",
+    "input_field": "value",
+    "current_value": ""
+  },
+  {
+    "title": "Width",
+    "node_id": "148",
+    "class_type": "PrimitiveInt",
+    "input_kind": "primitive",
+    "value_type": "int",
+    "input_field": "value",
+    "current_value": 720
+  },
+  {
+    "title": "Height",
+    "node_id": "149",
+    "class_type": "PrimitiveInt",
+    "input_kind": "primitive",
+    "value_type": "int",
+    "input_field": "value",
+    "current_value": 0
+  },
+  {
+    "title": "Duration",
+    "node_id": "150",
+    "class_type": "PrimitiveInt",
+    "input_kind": "primitive",
+    "value_type": "int",
+    "input_field": "value",
+    "current_value": 6
+  },
+  {
+    "title": "Width",
+    "node_id": "139:113",
+    "class_type": "PrimitiveInt",
+    "input_kind": "primitive",
+    "value_type": "int",
+    "input_field": "value",
+    "current_value": ["148", 0]
+  },
+  {
+    "title": "Frame Rate(int)",
+    "node_id": "139:114",
+    "class_type": "PrimitiveInt",
+    "input_kind": "primitive",
+    "value_type": "int",
+    "input_field": "value",
+    "current_value": 25
+  },
+  {
+    "title": "Duration",
+    "node_id": "139:143",
+    "class_type": "PrimitiveInt",
+    "input_kind": "primitive",
+    "value_type": "int",
+    "input_field": "value",
+    "current_value": ["150", 0]
+  },
+  {
+    "title": "Negative Prompt",
+    "node_id": "139:145",
+    "class_type": "PrimitiveStringMultiline",
+    "input_kind": "primitive",
+    "value_type": "string",
+    "input_field": "value",
+    "current_value": "blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, unreadable text on shirt or hat, incorrect lettering on cap (“PNTR”), incorrect t-shirt slogan (“JUST DO IT”), missing microphone, misplaced microphone, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, smiling, laughing, exaggerated sadness, wrong gaze direction, eyes looking at camera, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio, missing sniff sounds, incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, missing door or shelves, missing shallow depth of field, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts."
+  },
+  {
+    "title": "CFG",
+    "node_id": "139:147",
+    "class_type": "PrimitiveFloat",
+    "input_kind": "primitive",
+    "value_type": "float",
+    "input_field": "value",
+    "current_value": 1
+  },
+  {
+    "title": "Height",
+    "node_id": "139:98",
+    "class_type": "PrimitiveInt",
+    "input_kind": "primitive",
+    "value_type": "int",
+    "input_field": "value",
+    "current_value": ["149", 0]
+  }
+]

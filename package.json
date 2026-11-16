@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "fetch:api": "curl -o specs.json http://localhost:8000/api/docs/doc.json",
+    "fetch:api": "curl -o specs.json http://localhost:3001/api/docs/doc.json",
     "prepare": "husky"
   },
   "dependencies": {

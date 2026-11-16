@@ -33,6 +33,7 @@ import type {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PageHeading } from "@/components/studio/page-heading";
 import {
   Table,
   TableBody,
@@ -260,7 +261,7 @@ export default function TeamSettingsPage() {
 
   if (!team) {
     return (
-      <div className="mx-auto w-full max-w-3xl py-10 px-6 flex flex-col gap-8">
+      <div className="studio-page flex flex-col gap-8">
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-40 w-full" />
         <Skeleton className="h-64 w-full" />
@@ -271,17 +272,12 @@ export default function TeamSettingsPage() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="mx-auto w-full max-w-3xl py-10 px-6 flex flex-col gap-10">
+    <div className="studio-page flex flex-col gap-4">
       {/* Page header */}
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Team settings</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Manage {team.name}&apos;s info, and members.
-        </p>
-      </div>
+      <PageHeading eyebrow="Your shared workspace" title="The people behind it." description={<>Manage {team.name}&apos;s details, members, and invitations.</>} />
 
       {/* ── General ──────────────────────────────────────────────────────── */}
-      <section className="rounded-2xl border border-border p-6 flex flex-col gap-5">
+      <section className="studio-settings-section">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
             General
@@ -347,7 +343,7 @@ export default function TeamSettingsPage() {
       </section>
 
       {/* ── Members ──────────────────────────────────────────────────────── */}
-      <section className="rounded-2xl border border-border p-6 flex flex-col gap-5">
+      <section className="studio-settings-section">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           Members
         </h2>
@@ -464,7 +460,7 @@ export default function TeamSettingsPage() {
 
       {/* ── Invite links ─────────────────────────────────────────────────── */}
       {canEdit && (
-        <section className="rounded-2xl border border-border p-6 flex flex-col gap-5">
+        <section className="studio-settings-section">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">

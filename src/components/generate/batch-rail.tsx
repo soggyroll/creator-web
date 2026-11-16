@@ -77,6 +77,7 @@ export function BatchRail({
           variant="outline"
           size="icon-sm"
           onClick={onAddItem}
+          aria-label="Add generation to batch"
         >
           <PlusIcon />
         </Button>

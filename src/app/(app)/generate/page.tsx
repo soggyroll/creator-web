@@ -16,7 +16,7 @@ export default async function GeneratePage({ searchParams }: Props) {
   }
 
   return (
-    <div className="mx-[12%] flex flex-col gap-10 py-10">
+    <div className="studio-page">
       <GenerateHeading workflowId={workflow} />
       <GenerateForm workflowId={workflow} />
     </div>
